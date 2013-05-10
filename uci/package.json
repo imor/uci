@@ -1,0 +1,4 @@
+{
+	"name" : "uci",
+	"main" : "./lib/main.js"
+}
