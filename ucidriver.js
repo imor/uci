@@ -1,6 +1,6 @@
 var Engine = require('./uci').Engine;
 
-var uci = new Engine(2);
+var uci = new Engine();
 uci.on('ready', function() {
 	console.log('Engine ready');
 }).on('newGameReady', function () {
@@ -11,4 +11,4 @@ uci.on('ready', function() {
 }).on('moved', function (move) {
 	console.log('Engine moved ' + move.from + move.to)
 });
-uci.startNewGame();
+uci.startNewGame('w');

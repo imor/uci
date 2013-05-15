@@ -5,9 +5,8 @@ var spawn = require('child_process').spawn;
 var path = require('path');
 var Chess = require('./chess.js').Chess;
 
-var Engine = function(timePerMoveInSeconds) {
+var Engine = function() {
 	var self = this;
-	self.timePerMoveInSeconds = timePerMoveInSeconds;
 	////TODO:Remove hardcoded executable name
 	var engine = spawn(path.join(__dirname, '../engines/stockfish/stockfish-3-32-ja.exe'));
 
@@ -59,50 +58,57 @@ var Engine = function(timePerMoveInSeconds) {
 	run_engine_command(['uci'], 'uciok').then(function() {
 	self.emit('ready');});
 
+	function moveExtractor(data, ok_response) {
+		var str = data.toString().replace('\r\n', '\n').replace('\r', '\n');
+		var arr = str.split(/\n/);
+		for (var i = 0;i < arr.length;i++) {
+			var line = arr[i].replace('\r', '');
+			if (line.substring(0, ok_response.length) === ok_response) {
+				var moveRegex = /bestmove (.*?) /g;
+				var match = moveRegex.exec(line);
+				if (match) {
+					return convertToMoveObject(match[1]);
+				}
+				else {
+					throw new Error('Invalid format of bestmove. Expected "bestmove <move>". Returned "' + line +'"');
+				}
+			}
+		}
+		return false;
+	}
+
+	function convertToMoveObject(moveStr) {
+		var result = {};
+		result.from = moveStr.substring(0, 2);
+		result.to = moveStr.substring(2, 4);
+		if (moveStr.length > 4) {
+			result.promotion = moveStr.substring(5);
+		}
+		return result;
+	}
+
 	self.move = function(move) {
 		var validMove = self.chess.move(convertToMoveObject(move));
 		if (validMove === null) {
 			throw new Error('Invalid move ' + move);
 		}
-		function moveExtractor(data, ok_response) {
-			var str = data.toString().replace('\r\n', '\n').replace('\r', '\n');
-			var arr = str.split(/\n/);
-			for (var i = 0;i < arr.length;i++) {
-				var line = arr[i].replace('\r', '');
-				if (line.substring(0, ok_response.length) === ok_response) {
-					var moveRegex = /bestmove (.*?) /g;
-					var match = moveRegex.exec(line);
-					if (match) {
-						return convertToMoveObject(match[1]);
-					}
-					else {
-						throw new Error('Invalid format of bestmove. Expected "bestmove <move>". Returned "' + line +'"');
-					}
-				}
-			}
-			return false;
-		}
-
-		function convertToMoveObject(moveStr) {
-			var result = {};
-			result.from = moveStr.substring(0, 2);
-			result.to = moveStr.substring(2, 4);
-			if (moveStr.length > 4) {
-				result.promotion = moveStr.substring(5);
-			}
-			return result;
-		}
 		run_engine_command(['position fen ' + self.chess.fen(), 'isready'], 'readyok').then(function() {
-		return run_engine_command(['go movetime ' + (self.timePerMoveInSeconds * 1000)], 'bestmove', moveExtractor);}).then(function(move1) {
-			self.chess.move(move1);
-			self.emit('moved', move1);});
+		return run_engine_command(['go movetime 1000'], 'bestmove', moveExtractor);}).then(function(move) {
+			self.chess.move(move);
+			self.emit('moved', move);});
 	}
 
-	self.startNewGame = function() {
+	self.startNewGame = function(engineSide) {
 		self.chess = new Chess();
 		run_engine_command(['ucinewgame', 'isready'], 'readyok').then(function() {
 		return run_engine_command(['position startpos', 'isready'], 'readyok');}).then(function() {
-		self.emit('newGameReady');});
+			self.emit('newGameReady');
+			if (engineSide === 'w') {
+				run_engine_command(['go movetime 1000'], 'bestmove', moveExtractor).then(function(move) {
+				self.chess.move(move);
+				self.emit('moved', move);});
+			}
+		});
 	}
 };
 util.inherits(Engine, events.EventEmitter);
