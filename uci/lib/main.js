@@ -3,7 +3,8 @@ var util = require('util');
 var Q = require('q');
 var spawn = require('child_process').spawn;
 var path = require('path');
-	
+var Chess = require('./chess.js').Chess;
+
 var Engine = function(timePerMoveInSeconds) {
 	var self = this;
 	self.timePerMoveInSeconds = timePerMoveInSeconds;
@@ -11,7 +12,6 @@ var Engine = function(timePerMoveInSeconds) {
 	var engine = spawn(path.join(__dirname, '../engines/stockfish/stockfish-3-32-ja.exe'));
 
 	engine.on('close', function (code) {
-		console.log('child process exited with code ' + code);
 	});
 
 	function checker(data, ok_response) {
@@ -32,7 +32,6 @@ var Engine = function(timePerMoveInSeconds) {
 			var result = result_checker(data, ok_response);
 			if (result) {
 				clearTimeout(timerId);
-				console.log('completed commands ' + commands);
 				engine.stdout.removeListener('data', engine_stdout_listener);
 				deferred.resolve(result);
 			}
@@ -41,18 +40,16 @@ var Engine = function(timePerMoveInSeconds) {
 		for (var i = 0;i < commands.length;++i) {
 			engine.stdin.write(commands[i] + '\n');
 		}
-		
+
 		var timeout = 5000;
 		var timerId = setTimeout(function() {
 			engine.stdout.removeListener('data', engine_stdout_listener);
-			console.log('failed to complete commands ' + commands + ' withing ' + timeout + ' millisecs');
 			deferred.reject(new Error("Didn't receive result within " + timeout + " millisecs"));
 		}, timeout);
 		return deferred.promise;
 	}
 
 	function delay(ms) {
-		console.log('waiting for ' + ms + ' millisecs');
 		var deferred = Q.defer();
 		setTimeout(deferred.resolve, ms);
 		
@@ -60,13 +57,14 @@ var Engine = function(timePerMoveInSeconds) {
 	}
 
 	run_engine_command(['uci'], 'uciok').then(function() {
-	run_engine_command(['ucinewgame', 'isready'], 'readyok');}).then(function() {
-	run_engine_command(['position startpos', 'isready'], 'readyok');}).then(function() {
 	self.emit('ready');});
-	
-	self.moved = function(move) {
-		console.log('Other player moved ' + move + '. Enging thinking move...');
-		var moveExtractor = function(data, ok_response) {
+
+	self.move = function(move) {
+		var validMove = self.chess.move(convertToMoveObject(move));
+		if (validMove === null) {
+			throw new Error('Invalid move ' + move);
+		}
+		function moveExtractor(data, ok_response) {
 			var str = data.toString().replace('\r\n', '\n').replace('\r', '\n');
 			var arr = str.split(/\n/);
 			for (var i = 0;i < arr.length;i++) {
@@ -74,19 +72,37 @@ var Engine = function(timePerMoveInSeconds) {
 				if (line.substring(0, ok_response.length) === ok_response) {
 					var moveRegex = /bestmove (.*?) /g;
 					var match = moveRegex.exec(line);
-					console.log(line);
 					if (match) {
-						return match[1]
+						return convertToMoveObject(match[1]);
 					}
 					else {
-						new Error('Invalid format of bestmove. Expected "bestmove <move>". Returned "' + line +'"');
+						throw new Error('Invalid format of bestmove. Expected "bestmove <move>". Returned "' + line +'"');
 					}
 				}
 			}
 			return false;
-		};
-		run_engine_command(['go movetime ' + (self.timePerMoveInSeconds * 1000)], 'bestmove', moveExtractor).then(function(move) {
-		self.emit('moved', move);});
+		}
+
+		function convertToMoveObject(moveStr) {
+			var result = {};
+			result.from = moveStr.substring(0, 2);
+			result.to = moveStr.substring(2, 4);
+			if (moveStr.length > 4) {
+				result.promotion = moveStr.substring(5);
+			}
+			return result;
+		}
+		run_engine_command(['position fen ' + self.chess.fen(), 'isready'], 'readyok').then(function() {
+		return run_engine_command(['go movetime ' + (self.timePerMoveInSeconds * 1000)], 'bestmove', moveExtractor);}).then(function(move1) {
+			self.chess.move(move1);
+			self.emit('moved', move1);});
+	}
+
+	self.startNewGame = function() {
+		self.chess = new Chess();
+		run_engine_command(['ucinewgame', 'isready'], 'readyok').then(function() {
+		return run_engine_command(['position startpos', 'isready'], 'readyok');}).then(function() {
+		self.emit('newGameReady');});
 	}
 };
 util.inherits(Engine, events.EventEmitter);
