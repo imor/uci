@@ -21,7 +21,14 @@ uci.on('ready', function () {
 }).on('moved', function (move) {
     turn = turn === 'w' ? 'b' : 'w';
     console.log('Engine moved ' + move.from + move.to);
+}).on('error', function (message) {
+    console.log(message);
+    clearInterval(clock);
+}).on('exit', function (message) {
+    console.log(message);
+    clearInterval(clock);
 });
+
 uci.startNewGame('b', whiteMillisRemaining, blackMillisRemaining);
 
 function updateRemainingTimes() {
@@ -30,14 +37,13 @@ function updateRemainingTimes() {
     var millisToUpdate;
     if (turn === 'w') {
         millisToUpdate = whiteMillisRemaining = whiteMillisRemaining - diff;
-        console.log('White remaing time ' + whiteMillisRemaining / 1000);
     } else {
         millisToUpdate = blackMillisRemaining = blackMillisRemaining - diff;
-        console.log('Black remaing time ' + blackMillisRemaining / 1000);
     }
     if (millisToUpdate <= 0.0) {
         clearInterval(clock);
         console.log((turn === 'w' ? "White's" : "Black's") + ' time is up');
+        uci.shutdown();
         return;
     }
     lastTickTime = now;

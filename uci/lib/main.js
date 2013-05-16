@@ -10,7 +10,17 @@ var Engine = function () {
     ////TODO:Remove hardcoded executable name
     var engine = spawn(path.join(__dirname, '../engines/stockfish/stockfish-3-32-ja.exe'));
 
-    engine.on('close', function (code) {});
+    engine.on('close', function (code, signal) {
+        if (code != 0) {
+            self.emit('error', 'Engine process terminated abnormally with code ' + code);
+            return;
+        }
+        if (signal != null) {
+            self.emit('error', 'Engine process killed by signal ' + signal);
+            return;
+        }
+        self.emit('exit', 'Engine process exited normally');
+    });
 
     function checker(data, ok_response) {
         var str = data.toString().replace('\r\n', '\n').replace('\r', '\n');
@@ -110,13 +120,18 @@ var Engine = function () {
         }).then(function () {
             self.emit('newGameReady');
             if (engineSide === 'w') {
-                run_engine_command(createGoCommand(whiteMillisRemaining, blackMillisRemaining), 'bestmove', moveExtractor).then(function (move) {
+                run_engine_command(createGoCommand(whiteMillisRemaining, blackMillisRemaining),
+                    'bestmove', moveExtractor).then(function (move) {
                     self.chess.move(move);
                     self.emit('moved', move);
                 });
             }
         });
     };
+
+    self.shutdown = function () {
+        engine.stdin.write('quit\n');
+    }
 };
 util.inherits(Engine, events.EventEmitter);
 exports.Engine = Engine;
