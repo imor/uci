@@ -22,7 +22,7 @@ var Engine = function() {
 			}
 		}
 		return false;
-	};
+	}
 
 	function run_engine_command(commands, ok_response, result_checker) {
 		result_checker = result_checker ? result_checker : checker;
@@ -87,7 +87,7 @@ var Engine = function() {
 		return result;
 	}
 
-	self.move = function(move) {
+	self.move = function(move, whiteMillisRemaining, blackMillisRemaining) {
 		var validMove = self.chess.move(convertToMoveObject(move));
 		if (validMove === null) {
 			throw new Error('Invalid move ' + move);
@@ -96,40 +96,24 @@ var Engine = function() {
 		return run_engine_command(createGoCommand(), 'bestmove', moveExtractor);}).then(function(move) {
 			self.chess.move(move);
 			self.emit('moved', move);});
+	};
+
+	function createGoCommand(whiteMillisRemaining, blackMillisRemaining) {
+		return ['go wtime ' + whiteMillisRemaining + ' btime ' + blackMillisRemaining];
 	}
 
-	function createGoCommand() {
-		return ['go wtime ' + self.wMillisRemaining + ' btime ' + self.bMillisRemaining];
-	}
-
-	function updateRemainingTimes() {
-		var now = new Date();
-		var diff = now - self.lastTickTime;
-		var prop = self.chess.turn() + 'MillisRemaining';
-		self[prop] = self[prop] - diff;
-		if (self[prop] <= 0.0) {
-			clearInterval(self.clock);
-			self.emit('timeUp', self.chess.turn());
-			return;
-		}
-		self.lastTickTime = now;
-	}
-
-	self.startNewGame = function(engineSide, gameMinutes) {
+	self.startNewGame = function(engineSide, whiteMillisRemaining, blackMillisRemaining) {
 		self.chess = new Chess();
-		self.wMillisRemaining = self.bMillisRemaining = gameMinutes * 60 * 1000;
 		run_engine_command(['ucinewgame', 'isready'], 'readyok').then(function() {
 		return run_engine_command(['position startpos', 'isready'], 'readyok');}).then(function() {
 			self.emit('newGameReady');
-			self.lastTickTime = new Date();
-			self.clock = setInterval(updateRemainingTimes, 1000);
 			if (engineSide === 'w') {
-				run_engine_command(createGoCommand(), 'bestmove', moveExtractor).then(function(move) {
+				run_engine_command(createGoCommand(whiteMillisRemaining, blackMillisRemaining), 'bestmove', moveExtractor).then(function(move) {
 				self.chess.move(move);
 				self.emit('moved', move);});
 			}
 		});
-	}
+	};
 };
 util.inherits(Engine, events.EventEmitter);
 exports.Engine = Engine;
