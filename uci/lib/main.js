@@ -93,18 +93,38 @@ var Engine = function() {
 			throw new Error('Invalid move ' + move);
 		}
 		run_engine_command(['position fen ' + self.chess.fen(), 'isready'], 'readyok').then(function() {
-		return run_engine_command(['go movetime 1000'], 'bestmove', moveExtractor);}).then(function(move) {
+		return run_engine_command(createGoCommand(), 'bestmove', moveExtractor);}).then(function(move) {
 			self.chess.move(move);
 			self.emit('moved', move);});
 	}
 
-	self.startNewGame = function(engineSide) {
+	function createGoCommand() {
+		return ['go wtime ' + self.wMillisRemaining + ' btime ' + self.bMillisRemaining];
+	}
+
+	function updateRemainingTimes() {
+		var now = new Date();
+		var diff = now - self.lastTickTime;
+		var prop = self.chess.turn() + 'MillisRemaining';
+		self[prop] = self[prop] - diff;
+		if (self[prop] <= 0.0) {
+			clearInterval(self.clock);
+			self.emit('timeUp', self.chess.turn());
+			return;
+		}
+		self.lastTickTime = now;
+	}
+
+	self.startNewGame = function(engineSide, gameMinutes) {
 		self.chess = new Chess();
+		self.wMillisRemaining = self.bMillisRemaining = gameMinutes * 60 * 1000;
 		run_engine_command(['ucinewgame', 'isready'], 'readyok').then(function() {
 		return run_engine_command(['position startpos', 'isready'], 'readyok');}).then(function() {
 			self.emit('newGameReady');
+			self.lastTickTime = new Date();
+			self.clock = setInterval(updateRemainingTimes, 1000);
 			if (engineSide === 'w') {
-				run_engine_command(['go movetime 1000'], 'bestmove', moveExtractor).then(function(move) {
+				run_engine_command(createGoCommand(), 'bestmove', moveExtractor).then(function(move) {
 				self.chess.move(move);
 				self.emit('moved', move);});
 			}

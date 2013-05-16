@@ -10,5 +10,7 @@ uci.on('ready', function() {
 	});
 }).on('moved', function (move) {
 	console.log('Engine moved ' + move.from + move.to)
+}).on('timeUp', function(data) {
+	console.log((data === 'w' ? "White's" : "Black's") + ' time is up');
 });
-uci.startNewGame('w');
+uci.startNewGame('w', 3);
