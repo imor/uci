@@ -3,7 +3,7 @@ var util = require('util');
 var Q = require('q');
 var spawn = require('child_process').spawn;
 var path = require('path');
-var Chess = require('./chess.js').Chess;
+var Chess = require('chess.js').Chess;
 
 var Engine = function () {
     var self = this;

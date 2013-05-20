@@ -1,0 +1,1 @@
+A thin wrapper on a UCI chess engine
