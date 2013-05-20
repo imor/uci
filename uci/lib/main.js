@@ -4,6 +4,7 @@ var Q = require('q');
 var spawn = require('child_process').spawn;
 var path = require('path');
 var Chess = require('chess.js').Chess;
+var Clock = require('./clock.js').Clock;
 
 var Engine = function () {
     var self = this;
@@ -13,10 +14,12 @@ var Engine = function () {
     engine.on('close', function (code, signal) {
         if (code != 0) {
             self.emit('error', 'Engine process terminated abnormally with code ' + code);
+            self.clock.stop();
             return;
         }
         if (signal != null) {
             self.emit('error', 'Engine process killed by signal ' + signal);
+            self.clock.stop();
             return;
         }
         self.emit('exit', 'Engine process exited normally');
@@ -96,13 +99,13 @@ var Engine = function () {
         return result;
     }
 
-    self.move = function (move, whiteMillisRemaining, blackMillisRemaining) {
+    self.move = function (move) {
         var validMove = self.chess.move(convertToMoveObject(move));
         if (validMove === null) {
             throw new Error('Invalid move ' + move);
         }
         run_engine_command(['position fen ' + self.chess.fen(), 'isready'], 'readyok').then(function () {
-            return run_engine_command(createGoCommand(), 'bestmove', moveExtractor);
+            return run_engine_command(createGoCommand(self.clock.getWhiteMillisRemaining, self.clock.getBlackMillisRemaining), 'bestmove', moveExtractor);
         }).then(function (move) {
             self.chess.move(move);
             self.emit('moved', move);
@@ -113,14 +116,21 @@ var Engine = function () {
         return ['go wtime ' + whiteMillisRemaining + ' btime ' + blackMillisRemaining];
     }
 
-    self.startNewGame = function (engineSide, whiteMillisRemaining, blackMillisRemaining) {
+    self.startNewGame = function (engineSide, gameTimeInMinutes) {
         self.chess = new Chess();
+        self.clock = new Clock(gameTimeInMinutes);
+        self.clock.on('timeup', function (turn) {
+            var result = (turn === 'w' ? '0-1' : '1-0');
+            var reason = (turn === 'w' ? "white's" : "black's") + ' time is up';
+            self.emit('gameends', result, reason);
+        });
         run_engine_command(['ucinewgame', 'isready'], 'readyok').then(function () {
             return run_engine_command(['position startpos', 'isready'], 'readyok');
         }).then(function () {
             self.emit('newGameReady');
+            self.clock.start();
             if (engineSide === 'w') {
-                run_engine_command(createGoCommand(whiteMillisRemaining, blackMillisRemaining),
+                run_engine_command(createGoCommand(self.clock.getWhiteMillisRemaining, self.clock.getBlackMillisRemaining),
                     'bestmove', moveExtractor).then(function (move) {
                     self.chess.move(move);
                     self.emit('moved', move);
@@ -131,6 +141,7 @@ var Engine = function () {
 
     self.shutdown = function () {
         engine.stdin.write('quit\n');
+        self.clock.stop();
     }
 };
 util.inherits(Engine, events.EventEmitter);
