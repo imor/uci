@@ -1,22 +1,22 @@
 {
-	"name" : "uci",
-	"main" : "./lib/main.js",
-	"version": "0.1.0",
-	"author": "Raminder Singh <romi_ssk@yahoo.co.in>",
-	"description": "A thin wrapper on a UCI chess engine",
-	"repository": {
-		"type": "git",
-		"url": "https://imor80@bitbucket.org/imor80/uci.git"
-	},
-	"keywords": [
-		"chess",
-		"uci"
-	],
-	"dependencies" : {
-		"chess.js" :  "0.1.x"
-	},
-	"license": "MIT",
-	"engines": {
-		"node": ">=0.10"
-	}
+  "name": "uci",
+  "main": "./lib/main.js",
+  "version": "0.1.1",
+  "author": "Raminder Singh <romi_ssk@yahoo.co.in>",
+  "description": "A thin wrapper on a UCI chess engine",
+  "repository": {
+    "type": "git",
+    "url": "https://imor80@bitbucket.org/imor80/uci.git"
+  },
+  "keywords": [
+    "chess",
+    "uci"
+  ],
+  "dependencies": {
+    "chess.js": "0.1.x"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10"
+  }
 }
