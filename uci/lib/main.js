@@ -94,7 +94,7 @@ var Engine = function () {
         result.from = moveStr.substring(0, 2);
         result.to = moveStr.substring(2, 4);
         if (moveStr.length > 4) {
-            result.promotion = moveStr.substring(5);
+            result.promotion = moveStr.substring(4);
         }
         return result;
     }
