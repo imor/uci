@@ -6,14 +6,15 @@
   "description": "A thin wrapper on a UCI chess engine",
   "repository": {
     "type": "git",
-    "url": "https://imor80@bitbucket.org/imor80/uci.git"
+    "url": "https://github.com/imor/uci.git"
   },
   "keywords": [
     "chess",
     "uci"
   ],
   "dependencies": {
-    "chess.js": "0.1.x"
+    "chess.js": "0.1.x",
+	"q": "0.9.x"
   },
   "license": "MIT",
   "engines": {

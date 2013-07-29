@@ -1,4 +1,4 @@
-var Engine = require('./uci').Engine;
+var Engine = require('uci').Engine;
 
 var uci = new Engine();
 uci.on('ready', function () {
