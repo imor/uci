@@ -1,13 +1,15 @@
 UCI
 ===
 
-UCI is a thin wrapper on a UCI chess engine. It also runs a chess clock
-internally so that the user can quickly play a game of chess with time
-controls. Currently [stockfish](http://stockfishchess.org/) is bundled
-with UCI and though in principle other uci engines can be used neither
-any other engine has been tested nor does UCI automatically recognize
-new engines placed under the engines folder. You can hack the main.js
-file in lib folder yourself for now if you want to use another engine.
+UCI is a thin wrapper on a
+[uci interface](http://en.wikipedia.org/wiki/Universal_Chess_Interface)
+chess engine. It also runs a chess clock internally so that the user
+can quickly play a game of chess with time controls. Currently
+[stockfish](http://stockfishchess.org/) is bundled with UCI and though
+in principle other uci engines can be used neither any other engine
+has been tested nor does UCI automatically recognize new engines
+placed under the engines folder. You can hack the main.js file in lib
+folder yourself for now if you want to use another engine.
 
 ## Installation
 Make sure you have [node.js](http://nodejs.org/) installed.
