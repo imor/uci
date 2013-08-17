@@ -32,4 +32,4 @@ uci.on('ready', function () {
 });
 
 //Start a new 10 minute game with engine as black
-uci.startNewGame('b', 10);
+uci.startNewGame('white', 10);
