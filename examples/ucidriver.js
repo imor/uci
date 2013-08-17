@@ -6,7 +6,19 @@ uci.on('ready', function () {
 }).on('newgame', function () {
     var stdin = process.openStdin();
     stdin.on('data', function (move) {
-        uci.move(move.toString().replace('\r\n', ''));
+		function convertToMoveObject(move) {
+			if (typeof move == 'object') {
+				return move;
+			}
+			var result = {};
+			result.from = move.substring(0, 2);
+			result.to = move.substring(2, 4);
+			if (move.length > 4) {
+				result.promotion = move.substring(4);
+			}
+			return result;
+		}
+        uci.move(convertToMoveObject(move.toString().replace('\r\n', '')));
     });
 }).on('moved', function (move) {
     console.log('Engine moved ' + move.from + move.to +
