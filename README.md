@@ -23,16 +23,38 @@ Make sure you have [node.js](http://nodejs.org/) installed.
 var Engine = require('uci').Engine;
 var uci = new Engine();
 
+console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
     console.log('Engine ready');
+    console.log('Engines found - ' + uci.engines);
+    console.log('Using first engine - ' + uci.engines[0]);
+    //Start a new 10 minute game with engine as black
+    uci.startNewGame(uci.engines[0], 'black', 10);
 }).on('newgame', function () {
     var stdin = process.openStdin();
     stdin.on('data', function (move) {
-        uci.move(move.toString().replace('\r\n', ''));
+        if (move == 'exit\r\n' || move == 'quit\r\n') {
+            uci.shutdown();
+            process.exit();
+            return;
+        }
+        function convertToMoveObject(move) {
+            if (typeof move == 'object') {
+                return move;
+            }
+            var result = {};
+            result.from = move.substring(0, 2);
+            result.to = move.substring(2, 4);
+            if (move.length > 4) {
+                result.promotion = move.substring(4);
+            }
+            return result;
+        }
+        uci.move(convertToMoveObject(move.toString().replace('\r\n', '')));
     });
 }).on('moved', function (move) {
-    console.log('Engine moved ' + move.from + move.to + 
-    	(move.promotion ? move.promotion : ''));
+    console.log('Engine moved ' + move.from + move.to +
+        (move.promotion ? move.promotion : ''));
 }).on('error', function (message) {
     console.log('Error:' + message);
 }).on('exit', function (message) {
@@ -40,9 +62,6 @@ uci.on('ready', function () {
 }).on('gameends', function (result, reason) {
     console.log('Game ends with result ' + result + ' because ' + reason);
 });
-
-//Start a new 10 minute game with engine as black
-uci.startNewGame('b', 10);
 ```
 ## API
 
@@ -51,7 +70,8 @@ UCI is an [EventEmitter](http://nodejs.org/api/events.html) and it
 raises following events -
 
 #### ready
-This event is raised as soon as the engine process is running.
+This event is raised as soon as uci has completed enumerating all
+the engines.
 
 #### newgame
 This event is raised once UCI has started a new game.
@@ -97,12 +117,25 @@ uci.move(move);
 
 #### startNewGame
 This function starts a new game with the given arguments. The first
-argument is the side which engine will play. It should be either 'b'
-for black or 'w' for white. The second argument is the number of
-minutes for which the game will be played. e.g. 
+argument is the name of the engine executable. When a new uci instance
+is created it detects all the uci engines placed inside the engines
+directory and adds them to the uci.engines property; one of those
+engines can be passes as a value for this argument or any other value
+can be used if you like. The second argument is the side which engine
+will play. It should be either 'black' or 'white'. The third argument
+is the number of minutes for which the game will be played. e.g. 
 ```js
-uci.startNewGame('w', 10);
+uci.startNewGame('path/to/engine-executable', 'white', 10);
 ```
+
+#### shutdown
+This function should be called once at the end for cleanup. It will 
+send the quit uci command to any running engine process.
+
+## Installing your own engines
+Place your own uci engines inside the *uci/engines* directory. UCI will detect
+all the uci engines inside the engines directory by visiting all the files
+recursively and adding them to the uci.engines property.
 
 ## Contributing
 Fork, pick an issue to fix from [issues](https://github.com/imor/uci/issues)
