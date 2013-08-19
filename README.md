@@ -20,14 +20,14 @@ Make sure you have [node.js](http://nodejs.org/) installed.
 
 ## Example
 ```js
-var Engine = require('uci').Engine;
-var uci = new Engine();
+var UCI = require('uci').UCI;
+var uci = new UCI();
 
 console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
     console.log('Engine ready');
     console.log('Engines found - ' + uci.engines);
-    console.log('Using first engine - ' + uci.engines[0]);
+    console.log('Using first engine - ' + uci.getAvailableEngines()[0]);
     //Start a new 10 minute game with engine as black
     uci.startNewGame(uci.engines[0], 'black', 10);
 }).on('newgame', function () {
@@ -132,14 +132,19 @@ uci.startNewGame('path/to/engine-executable', 'white', 10);
 This function should be called once at the end for cleanup. It will 
 send the quit uci command to any running engine process.
 
+#### getAvailableEngines
+This function returns an array of file names which were detected as
+uci engines.
+
 ## Installing your own engines
 Place your own uci engines inside the *uci/engines* directory. UCI will detect
 all the uci engines inside the engines directory by visiting all the files
-recursively and adding them to the uci.engines property.
+recursively. The detected engines can be retrieved by calling the
+*getAvailableEngines* function.
 
 ## Contributing
 Fork, pick an issue to fix from [issues](https://github.com/imor/uci/issues)
-and send a pull request.
+or add a missing feature and send a pull request.
 
 ## Credits
 The excellent [chess.js](https://github.com/jhlywa/chess.js) library
