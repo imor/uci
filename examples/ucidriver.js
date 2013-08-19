@@ -5,7 +5,7 @@ console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
     console.log('Engine ready');
     console.log('Engines found - ' + uci.engines);
-    console.log('Using first engine - ' + uci.engines[0]);
+    console.log('Using first engine - ' + uci.getAvailableEngines()[0]);
     //Start a new 10 minute game with engine as black
     uci.startNewGame(uci.engines[0], 'black', 10);
 }).on('newgame', function () {
