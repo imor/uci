@@ -1,5 +1,5 @@
-var Engine = require('uci').Engine;
-var uci = new Engine();
+var UCI = require('uci').UCI;
+var uci = new UCI();
 
 console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
