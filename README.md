@@ -14,9 +14,9 @@ the main.js file in lib folder yourself for now if you want to use
 another engine.
 
 ## Installation
-Make sure you have [node.js](http://nodejs.org/) installed.
+Make sure you have [node.js](http://nodejs.org/) installed. Then do:
 
-    $npm install uci
+    $ npm install uci
 
 ## Example
 ```js
