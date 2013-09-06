@@ -1,17 +1,20 @@
 var UCI = require('uci').UCI;
 var uci = new UCI();
+var os = require('os');
+var Chess = require('chess.js').Chess;
+var game = new Chess();
 
 console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
-    console.log('Engine ready');
-    console.log('Engines found - ' + uci.engines);
-    console.log('Using first engine - ' + uci.getAvailableEngines()[0]);
     //Start a new 10 minute game with engine as black
     uci.startNewGame(uci.engines[0], 'black', 10);
 }).on('newgame', function () {
+    console.log("A new 10 minute game has started.");
+    console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
+    console.log(game.ascii());
     var stdin = process.openStdin();
     stdin.on('data', function (move) {
-        if (move == 'exit\r\n' || move == 'quit\r\n') {
+        if (move == 'exit' + os.EOL || move == 'quit' + os.EOL) {
             uci.shutdown();
             process.exit();
             return;
@@ -28,11 +31,15 @@ uci.on('ready', function () {
             }
             return result;
         }
-        uci.move(convertToMoveObject(move.toString().replace('\r\n', '')));
+	move = convertToMoveObject(move.toString().replace(os.EOL, ''));
+	game.move(move);
+	console.log(game.ascii());
+	console.log("Engine thinking...");
+        uci.move(move);
     });
 }).on('moved', function (move) {
-    console.log('Engine moved ' + move.from + move.to +
-        (move.promotion ? move.promotion : ''));
+    game.move(move);
+    console.log(game.ascii());
 }).on('error', function (message) {
     console.log('Error:' + message);
 }).on('exit', function (message) {
