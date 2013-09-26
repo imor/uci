@@ -6,6 +6,8 @@ var game = new Chess();
 
 console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
+    //Use first opening book
+    uci.setCurrentBook(uci.getAvailableBooks()[0]);
     //Start a new 10 minute game with engine as black
     uci.startNewGame(uci.getAvailableEngines()[0], 'black', 10);
 }).on('newgame', function () {
@@ -39,6 +41,7 @@ uci.on('ready', function () {
     });
 }).on('moved', function (move) {
     game.move(move);
+    console.log(move.from + move.to + (move.promotion ? move.promotion : ''));
     console.log(game.ascii());
 }).on('error', function (message) {
     console.log('Error:' + message);
