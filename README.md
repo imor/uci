@@ -1,4 +1,5 @@
-UCI ===
+UCI
+===
 
 UCI is a thin wrapper on a [uci
 interface](http://en.wikipedia.org/wiki/Universal_Chess_Interface) chess engine.
@@ -119,12 +120,12 @@ uci.move(move);
 ```
 
 #### getAvailableEngines()
-This function returns a list of all the valid uci chess engines found in the
-*uci/engines* directory.
+When a new uci instance is created it detects all the uci engines placed inside
+the *uci/engines* directory. This function returns a list of these engines.
 
 #### getAvailableBooks()
-This function returns a list of all the books found in the *uci/books*
-directory.
+When a new uci instance is created it enumerates all the files in the
+*uci/books* directory. This function returns a list of these books.
 
 #### getCurrentBook()
 Current book is the book which will be used by UCI during a game. This function
@@ -133,19 +134,15 @@ returns the current book.
 #### setCurrentBook(curBook)
 This function sets the curBook as the current book.
 
-#### startNewGame
-This function starts a new game with the given arguments. The first argument is
-the name of the engine executable. When a new uci instance is created it detects
-all the uci engines placed inside the engines directory and adds them to the
-uci.engines property; one of those engines can be passes as a value for this
-argument or any other value can be used if you like. The second argument is the
-side which engine will play. It should be either 'black' or 'white'. The third
-argument is the number of minutes for which the game will be played. e.g.
+#### startNewGame(engine, engineSide, gameLength)
+This function starts a new game. _engine_ is the path of the engine executable,
+_engineSide_ is the side which the engine will play. It should be either 'white'
+or 'black'. _gameLength_ is the game length in minutes.
 ```js
 uci.startNewGame('path/to/engine-executable', 'white', 10);
 ```
 
-#### shutdown
+#### shutdown()
 This function should be called once at the end for cleanup. It will send the
 quit uci command to any running engine process.
 
@@ -157,9 +154,9 @@ recursively. The detected engines can be retrieved by calling the
 
 ## Installing books
 Place any polyglot format books under the *uci/books* directory. You can also
-create sub directory withing the books directory for better organization of your
-books. UCI will treat all files found recursively under the *uci/books*
-directory as valid polyglot books so only put valid books files there.
+create sub directories within the books directory for better organization of
+your books. UCI will treat all files found recursively under the *uci/books*
+directory as polyglot books so only put valid books files there.
 
 ## Contributing
 Fork, pick an issue to fix from [issues](https://github.com/imor/uci/issues) or
