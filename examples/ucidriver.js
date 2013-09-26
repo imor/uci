@@ -49,4 +49,6 @@ uci.on('ready', function () {
     console.log('Exiting:' + message);
 }).on('gameends', function (result, reason) {
     console.log('Game ends with result ' + result + ' because ' + reason);
+    uci.shutdown();
+    process.exit();
 });
