@@ -1,3 +1,4 @@
+'use strict';
 var UCI = require('uci').UCI;
 var uci = new UCI();
 var os = require('os');
