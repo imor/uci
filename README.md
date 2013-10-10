@@ -25,10 +25,10 @@ var game = new Chess();
 
 console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
-    //Use first opening book
-    uci.setCurrentBook(uci.getAvailableBooks()[0]);
-    //Start a new 10 minute game with engine as black
-    uci.startNewGame(uci.getAvailableEngines()[0], 'black', 10);
+    //Start a new 10 minute game with engine as black, use the first found
+    //engine and the first found polyglot book
+    uci.startNewGame(uci.getAvailableEngines()[0], 'black', 10,
+        uci.getAvailableBooks()[0]);
 }).on('newgame', function () {
     console.log("A new 10 minute game has started.");
     console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
@@ -129,19 +129,14 @@ the *uci/engines* directory. This function returns a list of these engines.
 When a new uci instance is created it enumerates all the files in the
 *uci/books* directory. This function returns a list of these books.
 
-#### getCurrentBook()
-Current book is the book which will be used by UCI during a game. This function
-returns the current book.
-
-#### setCurrentBook(curBook)
-This function sets the curBook as the current book.
-
-#### startNewGame(engine, engineSide, gameLength)
+#### startNewGame(engine, engineSide, gameLength, [bookFile])
 This function starts a new game. _engine_ is the path of the engine executable,
 _engineSide_ is the side which the engine will play. It should be either 'white'
-or 'black'. _gameLength_ is the game length in minutes.
+or 'black'. _gameLength_ is the game length in minutes. The optional bookFile is
+the path to the polyglot book which should be used to lookup moves.
 ```js
-uci.startNewGame('path/to/engine-executable', 'white', 10);
+uci.startNewGame('path/to/engine-executable', 'white', 10,
+    'path/to/polyglot-book);
 ```
 
 #### shutdown()

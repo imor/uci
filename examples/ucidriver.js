@@ -7,10 +7,10 @@ var game = new Chess();
 
 console.log('Type exit or quit to exit.');
 uci.on('ready', function () {
-    //Use first opening book
-    uci.setCurrentBook(uci.getAvailableBooks()[0]);
-    //Start a new 10 minute game with engine as black
-    uci.startNewGame(uci.getAvailableEngines()[0], 'black', 10);
+    //Start a new 10 minute game with engine as black, use the first found
+    //engine and the first found polyglot book
+    uci.startNewGame(uci.getAvailableEngines()[0], 'black', 10,
+        uci.getAvailableBooks()[0]);
 }).on('newgame', function () {
     console.log("A new 10 minute game has started.");
     console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
