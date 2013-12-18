@@ -14,7 +14,7 @@ section for that.
 Make sure you have [node.js](http://nodejs.org/) installed. Then do:
 
     $ npm install uci
-
+uci.startNewGame('path/to/engine-executable
 ## Example
 ```js
 var UCI = require('uci').UCI;
@@ -136,7 +136,7 @@ or 'black'. _gameLength_ is the game length in minutes. The optional bookFile is
 the path to the polyglot book which should be used to lookup moves.
 ```js
 uci.startNewGame('path/to/engine-executable', 'white', 10,
-    'path/to/polyglot-book);
+    'path/to/polyglot-book');
 ```
 
 #### shutdown()
