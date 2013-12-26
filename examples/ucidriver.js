@@ -1,24 +1,19 @@
 'use strict';
-var UCI = require('uci').UCI;
-var uci = new UCI();
+
+var UciEngine = require('uci');
+var engine = new UciEngine();
 var os = require('os');
 var Chess = require('chess.js').Chess;
 var game = new Chess();
 
 console.log('Type exit or quit to exit.');
-uci.on('ready', function () {
-    //Start a new 10 minute game with engine as black, use the first found
-    //engine and the first found polyglot book
-    uci.startNewGame(uci.getAvailableEngines()[0], 'black', 10,
-        uci.getAvailableBooks()[0]);
-}).on('newgame', function () {
+engine.on('NewGameStarted', function () {
     console.log("A new 10 minute game has started.");
     console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
     console.log(game.ascii());
     var stdin = process.openStdin();
     stdin.on('data', function (move) {
         if (move == 'exit' + os.EOL || move == 'quit' + os.EOL) {
-            uci.shutdown();
             process.exit();
             return;
         }
@@ -34,22 +29,20 @@ uci.on('ready', function () {
             }
             return result;
         }
-	move = convertToMoveObject(move.toString().replace(os.EOL, ''));
-	game.move(move);
-	console.log(game.ascii());
-	console.log("Engine thinking...");
-        uci.move(move);
+        move = convertToMoveObject(move.toString().replace(os.EOL, ''));
+        game.move(move);
+        console.log(game.ascii());
+        console.log("Engine thinking...");
+        engine.move(move);
     });
-}).on('moved', function (move) {
+}).on('EngineMoved', function (move) {
     game.move(move);
-    console.log(move.from + move.to + (move.promotion ? move.promotion : ''));
+    console.log('Engine moved ' + move.from + move.to + (move.promotion ? move.promotion : ''));
     console.log(game.ascii());
-}).on('error', function (message) {
-    console.log('Error:' + message);
-}).on('exit', function (message) {
-    console.log('Exiting:' + message);
-}).on('gameends', function (result, reason) {
-    console.log('Game ends with result ' + result + ' because ' + reason);
-    uci.shutdown();
+}).on('GameEnded', function (result, reason) {
+    console.log('Game ended. Result: ' + result + '. Reason: ' + reason + '.');
     process.exit();
+}).on('Error', function (error) {
+    console.log('Error:' + error);
 });
+engine.startNewGame(engine.getAvailableEngines()[0], 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);

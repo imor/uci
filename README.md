@@ -17,26 +17,20 @@ Make sure you have [node.js](http://nodejs.org/) installed. Then do:
 uci.startNewGame('path/to/engine-executable
 ## Example
 ```js
-var UCI = require('uci').UCI;
-var uci = new UCI();
+var UciEngine = require('uci');
+var engine = new UciEngine();
 var os = require('os');
 var Chess = require('chess.js').Chess;
 var game = new Chess();
 
 console.log('Type exit or quit to exit.');
-uci.on('ready', function () {
-    //Start a new 10 minute game with engine as black, use the first found
-    //engine and the first found polyglot book
-    uci.startNewGame(uci.getAvailableEngines()[0], 'black', 10,
-        uci.getAvailableBooks()[0]);
-}).on('newgame', function () {
+engine.on('NewGameStarted', function () {
     console.log("A new 10 minute game has started.");
     console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
     console.log(game.ascii());
     var stdin = process.openStdin();
     stdin.on('data', function (move) {
         if (move == 'exit' + os.EOL || move == 'quit' + os.EOL) {
-            uci.shutdown();
             process.exit();
             return;
         }
@@ -52,25 +46,23 @@ uci.on('ready', function () {
             }
             return result;
         }
-	move = convertToMoveObject(move.toString().replace(os.EOL, ''));
-	game.move(move);
-	console.log(game.ascii());
-	console.log("Engine thinking...");
-        uci.move(move);
+        move = convertToMoveObject(move.toString().replace(os.EOL, ''));
+        game.move(move);
+        console.log(game.ascii());
+        console.log("Engine thinking...");
+        engine.move(move);
     });
-}).on('moved', function (move) {
+}).on('EngineMoved', function (move) {
     game.move(move);
-    console.log(move.from + move.to + (move.promotion ? move.promotion : ''));
+    console.log('Engine moved ' + move.from + move.to + (move.promotion ? move.promotion : ''));
     console.log(game.ascii());
-}).on('error', function (message) {
-    console.log('Error:' + message);
-}).on('exit', function (message) {
-    console.log('Exiting:' + message);
-}).on('gameends', function (result, reason) {
-    console.log('Game ends with result ' + result + ' because ' + reason);
-    uci.shutdown();
+}).on('GameEnded', function (result, reason) {
+    console.log('Game ended. Result: ' + result + '. Reason: ' + reason + '.');
     process.exit();
+}).on('Error', function (error) {
+    console.log('Error:' + error);
 });
+engine.startNewGame(engine.getAvailableEngines()[0], 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
 ```
 ## API
 
@@ -78,13 +70,10 @@ uci.on('ready', function () {
 UCI is an [EventEmitter](http://nodejs.org/api/events.html) and it raises
 following events -
 
-#### ready
-This event is raised as soon as uci has completed enumerating all the engines.
-
-#### newgame
+#### NewGameStarted
 This event is raised once UCI has started a new game.
 
-#### moved
+#### EngineMoved
 This event is raised when the engine has made a move. The only argument _move_
 is an object with properties _from_, _to_ and _promotion_. _from_ and _to_ are
 the algebraic notation square names for the from square and to square
@@ -94,16 +83,12 @@ promoted otherwise it is null. E.g. following is a valid move object
 {from:'h7', to:'h8', promotion:'q'}
 ```
 
-#### error
+#### Error
 This event is raised when UCI detects an error. E.g. if the move function is
 passed an invalid move object. The argument _message_ contains a string with
 details about the error.
 
-#### exit
-This event is raised when the UCI engine process terminates. The argument
-_message_ contains a string with the reason for exiting.
-
-#### gameends
+#### GameEnded
 This event is raised when the game ends either in a draw or with one of the
 players (engine or the other player) winning. The two arguments are _result_
 which contains the result in a string (e.g. '1-0', '1/2-1/2' or '0-1') and
@@ -138,10 +123,6 @@ the path to the polyglot book which should be used to lookup moves.
 uci.startNewGame('path/to/engine-executable', 'white', 10,
     'path/to/polyglot-book');
 ```
-
-#### shutdown()
-This function should be called once at the end for cleanup. It will send the
-quit uci command to any running engine process.
 
 ## Installing engines
 Place your own uci engines inside the *uci/engines* directory. UCI will detect
