@@ -4,7 +4,7 @@
   "author": "Raminder Singh <romi_ssk@yahoo.co.in>",
   "description": "A command line client for UCI",
   "dependencies": {
-    "uci": "0.1.x",
+    "uci": "0.2.x",
     "chess.js": "0.1.x"
   },
   "license": "MIT",
