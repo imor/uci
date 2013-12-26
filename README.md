@@ -1,6 +1,8 @@
 UCI
 ===
 
+NOTE:This version is not backwards compatible with 0.1.x series of releases. This was kind of expected as this module is still very young.
+
 UCI is a thin wrapper on a [uci
 interface](http://en.wikipedia.org/wiki/Universal_Chess_Interface) chess engine.
 It also runs a chess clock and a [chess.js](https://github.com/jhlywa/chess.js)
