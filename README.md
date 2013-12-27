@@ -19,6 +19,8 @@ Make sure you have [node.js](http://nodejs.org/) installed. Then do:
 uci.startNewGame('path/to/engine-executable
 ## Example
 ```js
+'use strict';
+
 var UciEngine = require('uci');
 var engine = new UciEngine();
 var os = require('os');
@@ -26,7 +28,9 @@ var Chess = require('chess.js').Chess;
 var game = new Chess();
 
 console.log('Type exit or quit to exit.');
-engine.on('NewGameStarted', function () {
+engine.on('Ready', function () {
+    engine.startNewGame('Stockfish 3', 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
+}).on('NewGameStarted', function () {
     console.log("A new 10 minute game has started.");
     console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
     console.log(game.ascii());
@@ -63,14 +67,18 @@ engine.on('NewGameStarted', function () {
     process.exit();
 }).on('Error', function (error) {
     console.log('Error:' + error);
+    process.exit();
 });
-engine.startNewGame(engine.getAvailableEngines()[0], 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
+
 ```
 ## API
 
 ### Events
 UCI is an [EventEmitter](http://nodejs.org/api/events.html) and it raises
 following events -
+
+#### Ready
+This event is raised once UCI has enumerated all the engines and books.
 
 #### NewGameStarted
 This event is raised once UCI has started a new game.
