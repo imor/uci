@@ -8,7 +8,10 @@ var game = new Chess();
 
 console.log('Type exit or quit to exit.');
 engine.on('Ready', function () {
-    engine.startNewGame('Stockfish 3', 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
+    for (var e in engine.getAvailableEngines()) {
+        engine.startNewGame(e, 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
+        break;
+    }
 }).on('NewGameStarted', function () {
     console.log("A new 10 minute game has started.");
     console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
