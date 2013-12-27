@@ -40,9 +40,9 @@ engine.on('Ready', function () {
         console.log("Engine thinking...");
         engine.move(move);
     });
-}).on('EngineMoved', function (move) {
+}).on('EngineMoved', function (move, bookMove) {
     game.move(move);
-    console.log('Engine moved ' + move.from + move.to + (move.promotion ? move.promotion : ''));
+    console.log('Engine moved ' + move.from + move.to + (move.promotion ? move.promotion : '') + '. BookMove:' + bookMove);
     console.log(game.ascii());
 }).on('GameEnded', function (result, reason) {
     console.log('Game ended. Result: ' + result + '. Reason: ' + reason + '.');
