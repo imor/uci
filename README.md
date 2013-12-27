@@ -84,7 +84,7 @@ This event is raised once UCI has enumerated all the engines and books.
 This event is raised once UCI has started a new game.
 
 #### EngineMoved
-This event is raised when the engine has made a move. The only argument _move_
+This event is raised when the engine has made a move. The first argument _move_
 is an object with properties _from_, _to_ and _promotion_. _from_ and _to_ are
 the algebraic notation square names for the from square and to square
 respectively. _promotion_ property contains the piece to which the pawn is being
@@ -92,6 +92,8 @@ promoted otherwise it is null. E.g. following is a valid move object
 ```js
 {from:'h7', to:'h8', promotion:'q'}
 ```
+The second argument is a boolean which is true if it is a book move and false
+otherwise.
 
 #### Error
 This event is raised when UCI detects an error. E.g. if the move function is
