@@ -29,7 +29,10 @@ var game = new Chess();
 
 console.log('Type exit or quit to exit.');
 engine.on('Ready', function () {
-    engine.startNewGame('Stockfish 3', 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
+    for (var e in engine.getAvailableEngines()) {
+        engine.startNewGame(e, 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
+        break;
+    }
 }).on('NewGameStarted', function () {
     console.log("A new 10 minute game has started.");
     console.log("Enter your moves in algebraic notation. E.g. e2e4<Enter>");
@@ -40,27 +43,15 @@ engine.on('Ready', function () {
             process.exit();
             return;
         }
-        function convertToMoveObject(move) {
-            if (typeof move == 'object') {
-                return move;
-            }
-            var result = {};
-            result.from = move.substring(0, 2);
-            result.to = move.substring(2, 4);
-            if (move.length > 4) {
-                result.promotion = move.substring(4);
-            }
-            return result;
-        }
         move = convertToMoveObject(move.toString().replace(os.EOL, ''));
         game.move(move);
         console.log(game.ascii());
         console.log("Engine thinking...");
         engine.move(move);
     });
-}).on('EngineMoved', function (move) {
+}).on('EngineMoved', function (move, bookMove) {
     game.move(move);
-    console.log('Engine moved ' + move.from + move.to + (move.promotion ? move.promotion : ''));
+    console.log('Engine moved ' + move.from + move.to + (move.promotion ? move.promotion : '') + '. BookMove:' + bookMove);
     console.log(game.ascii());
 }).on('GameEnded', function (result, reason) {
     console.log('Game ended. Result: ' + result + '. Reason: ' + reason + '.');
@@ -70,6 +61,18 @@ engine.on('Ready', function () {
     process.exit();
 });
 
+function convertToMoveObject(move) {
+    if (typeof move == 'object') {
+        return move;
+    }
+    var result = {};
+    result.from = move.substring(0, 2);
+    result.to = move.substring(2, 4);
+    if (move.length > 4) {
+        result.promotion = move.substring(4);
+    }
+    return result;
+}
 ```
 ## API
 
