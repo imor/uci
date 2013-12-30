@@ -33,7 +33,7 @@ uci.on('Ready', function () {
     for (var e in availableEngines) {
         var currentEngine = availableEngines[e];
         currentEngine.setOption('Skill Level', 20);
-        uci.startNewGame(currentEngine, 'black', 1000 * 60 * 10, uci.getAvailableBooks()[0]);
+        uci.startNewGame(currentEngine, 'black', 10, uci.getAvailableBooks()[0]);
         break;
     }
 }).on('NewGameStarted', function () {
