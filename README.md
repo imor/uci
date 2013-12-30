@@ -22,15 +22,18 @@ uci.startNewGame('path/to/engine-executable
 'use strict';
 
 var UciEngine = require('uci');
-var engine = new UciEngine();
+var uci = new UciEngine();
 var os = require('os');
 var Chess = require('chess.js').Chess;
 var game = new Chess();
 
 console.log('Type exit or quit to exit.');
-engine.on('Ready', function () {
-    for (var e in engine.getAvailableEngines()) {
-        engine.startNewGame(e, 'black', 1000 * 60 * 10, engine.getAvailableBooks()[0]);
+uci.on('Ready', function () {
+    var availableEngines = uci.getAvailableEngines();
+    for (var e in availableEngines) {
+        var currentEngine = availableEngines[e];
+        currentEngine.setOption('Skill Level', 20);
+        uci.startNewGame(currentEngine, 'black', 1000 * 60 * 10, uci.getAvailableBooks()[0]);
         break;
     }
 }).on('NewGameStarted', function () {
@@ -47,7 +50,7 @@ engine.on('Ready', function () {
         game.move(move);
         console.log(game.ascii());
         console.log("Engine thinking...");
-        engine.move(move);
+        uci.move(move);
     });
 }).on('EngineMoved', function (move, bookMove) {
     game.move(move);
@@ -58,7 +61,6 @@ engine.on('Ready', function () {
     process.exit();
 }).on('Error', function (error) {
     console.log('Error:' + error);
-    process.exit();
 });
 
 function convertToMoveObject(move) {
