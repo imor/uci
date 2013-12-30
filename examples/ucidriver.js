@@ -22,18 +22,6 @@ engine.on('Ready', function () {
             process.exit();
             return;
         }
-        function convertToMoveObject(move) {
-            if (typeof move == 'object') {
-                return move;
-            }
-            var result = {};
-            result.from = move.substring(0, 2);
-            result.to = move.substring(2, 4);
-            if (move.length > 4) {
-                result.promotion = move.substring(4);
-            }
-            return result;
-        }
         move = convertToMoveObject(move.toString().replace(os.EOL, ''));
         game.move(move);
         console.log(game.ascii());
@@ -51,3 +39,16 @@ engine.on('Ready', function () {
     console.log('Error:' + error);
     process.exit();
 });
+
+function convertToMoveObject(move) {
+    if (typeof move == 'object') {
+        return move;
+    }
+    var result = {};
+    result.from = move.substring(0, 2);
+    result.to = move.substring(2, 4);
+    if (move.length > 4) {
+        result.promotion = move.substring(4);
+    }
+    return result;
+}
