@@ -9,9 +9,9 @@ var game = new Chess();
 console.log('Type exit or quit to exit.');
 uci.on('Ready', function () {
     var availableEngines = uci.getAvailableEngines();
-    for (var e in availableEngines) {
-        var currentEngine = availableEngines[e];
-        currentEngine.setOption('Skill Level', 20);
+    for (var i = 0;i < availableEngines.length;i++) {
+        var currentEngine = availableEngines[i];
+        currentEngine.setOption('Skill Level', 1);
         uci.startNewGame(currentEngine, 'black', 10, uci.getAvailableBooks()[0]);
         break;
     }

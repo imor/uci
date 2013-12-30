@@ -30,9 +30,9 @@ var game = new Chess();
 console.log('Type exit or quit to exit.');
 uci.on('Ready', function () {
     var availableEngines = uci.getAvailableEngines();
-    for (var e in availableEngines) {
-        var currentEngine = availableEngines[e];
-        currentEngine.setOption('Skill Level', 20);
+    for (var i = 0;i < availableEngines.length;i++) {
+        var currentEngine = availableEngines[i];
+        currentEngine.setOption('Skill Level', 1);
         uci.startNewGame(currentEngine, 'black', 10, uci.getAvailableBooks()[0]);
         break;
     }
@@ -125,7 +125,7 @@ uci.move(move);
 
 #### getAvailableEngines()
 When a new uci instance is created it detects all the uci engines placed inside
-the *uci/engines* directory. This function returns a list of these engines.
+the *uci/engines* directory. This function returns an array of these engine objects. See _Engine Object_ section below.
 
 #### getAvailableBooks()
 When a new uci instance is created it enumerates all the files in the
@@ -140,6 +140,15 @@ the path to the polyglot book which should be used to lookup moves.
 uci.startNewGame('path/to/engine-executable', 'white', 10,
     'path/to/polyglot-book');
 ```
+
+### Engine Object
+Each object in the array of engine objects returned in getAvailableEngines() function is described here.
+
+#### setOption function
+This function takes a string optionName and a primitive optionValue. Options set using this function will be set on the UCI chess engine. For boolean options the optionValue should not be passed.
+
+#### availableOptions property
+This property contains an array of strings of the options available on the UCI engine.
 
 ## Installing engines
 Place your own uci engines inside the *uci/engines* directory. UCI will detect
