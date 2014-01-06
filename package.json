@@ -15,7 +15,7 @@
   "dependencies": {
     "chess.js": "0.1.x",
     "q": "0.9.x",
-    "mime-magic": "5.14.x",
+	"is-running": "1.0.x",
     "polyglot-chess": "0.1.x",
     "string": "1.7.x"
   },

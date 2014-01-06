@@ -12,6 +12,7 @@ uci.on('Ready', function () {
     for (var i = 0;i < availableEngines.length;i++) {
         var currentEngine = availableEngines[i];
         currentEngine.setOption('Skill Level', 1);
+        currentEngine.setOption('MultiPV', 10);
         uci.startNewGame(currentEngine, 'black', 10, uci.getAvailableBooks()[0]);
         break;
     }
