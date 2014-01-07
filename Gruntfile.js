@@ -17,22 +17,22 @@ module.exports = function(grunt) {
                 }
             }
         },
-        docco: {
-            docs: {
-                src: ['lib/*.js'],
-                options: {
-                    output: 'docs/',
-                    layout: 'classic'
-                }
+        groc: {
+            javascript: [
+                "lib/*.js"
+            ],
+            options: {
+                "out": "docs/",
+                "whitespace-after-token": false
             }
         }
     });
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-cafe-mocha');
-    grunt.loadNpmTasks('grunt-docco');
+    grunt.loadNpmTasks('grunt-groc');
 
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test', ['cafemocha']);
-    grunt.registerTask('doc', ['docco']);
+    grunt.registerTask('doc', ['groc']);
     grunt.registerTask('default', ['test', 'lint', 'doc']);
 };

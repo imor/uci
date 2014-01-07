@@ -15,7 +15,7 @@
   "dependencies": {
     "chess.js": "0.1.x",
     "q": "0.9.x",
-	"is-running": "1.0.x",
+    "is-running": "1.0.x",
     "polyglot-chess": "0.1.x",
     "string": "1.7.x"
   },
@@ -26,9 +26,8 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.4",
-    "grunt-docco": "~0.3.0",
     "grunt-cafe-mocha": "~0.1.9",
-    "mocha": "~1.13.0"
+    "grunt-groc": "~0.4.0"
   },
   "scripts": {
     "postinstall": "node ./lib/makeExecutable.js"
