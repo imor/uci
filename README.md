@@ -135,7 +135,7 @@ When a new uci instance is created it enumerates all the files in the
 This function starts a new game. _engine_ is the path of the engine executable,
 _engineSide_ is the side which the engine will play. It should be either 'white'
 or 'black'. _gameLength_ is the game length in minutes. The optional bookFile is
-the path to the polyglot book which should be used to lookup moves.
+the path to the polyglot book which the engine will use to lookup moves.
 ```js
 uci.startNewGame('path/to/engine-executable', 'white', 10,
     'path/to/polyglot-book');
