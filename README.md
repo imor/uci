@@ -153,7 +153,7 @@ This property contains an array of strings of the options available on the UCI e
 ## Installing engines
 Place your own uci engines inside the *uci/engines* directory. UCI will detect
 all the uci engines inside the engines directory by visiting all the files
-recursively. The detected engines can be retrieved by calling the
+recursively and trying to run them. The detected engines can be retrieved by calling the
 *getAvailableEngines* function.
 
 ## Installing books
