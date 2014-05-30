@@ -16,7 +16,7 @@ section for that.
 Make sure you have [node.js](http://nodejs.org/) installed. Then do:
 
     $ npm install uci
-uci.startNewGame('path/to/engine-executable
+
 ## Example
 ```js
 'use strict';
