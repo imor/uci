@@ -4,6 +4,7 @@
   "version": "0.3.1",
   "author": "Raminder Singh <romi_ssk@yahoo.co.in>",
   "description": "A thin wrapper on a UCI chess engine",
+  "homepage": "http://imor.github.io/uci/docs/src/main.html",
   "repository": {
     "type": "git",
     "url": "https://github.com/imor/uci.git"
