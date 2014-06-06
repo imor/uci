@@ -1,8 +1,4 @@
-var fs = require('fs');
-var path = require('path');
 var isRunning = require('is-running');
-var Q = require('q');
-var Engine = require('./chessengine.js').Engine;
 
 //Converts a move string to a move object. For the format of the move string and
 //structure of the move object see

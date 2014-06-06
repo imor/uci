@@ -1,7 +1,7 @@
 {
   "name": "uci",
   "main": "./src/main.js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "Raminder Singh <romi_ssk@yahoo.co.in>",
   "description": "A thin wrapper on a UCI chess engine",
   "repository": {
