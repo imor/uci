@@ -1,7 +1,7 @@
 {
   "name": "uci",
-  "main": "./lib/main.js",
-  "version": "0.2.16",
+  "main": "./src/main.js",
+  "version": "0.3.0",
   "author": "Raminder Singh <romi_ssk@yahoo.co.in>",
   "description": "A thin wrapper on a UCI chess engine",
   "repository": {
@@ -13,10 +13,8 @@
     "uci"
   ],
   "dependencies": {
-    "chess.js": "0.1.x",
     "q": "0.9.x",
     "is-running": "1.0.x",
-    "polyglot-chess": "0.1.x",
     "string": "1.7.x"
   },
   "license": "MIT",
@@ -28,8 +26,5 @@
     "grunt-contrib-jshint": "~0.6.4",
     "grunt-cafe-mocha": "~0.1.9",
     "grunt-groc": "~0.4.0"
-  },
-  "scripts": {
-    "postinstall": "node ./lib/makeExecutable.js"
   }
 }
