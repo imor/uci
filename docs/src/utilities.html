@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="en"><head><title>src\utilities</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="src\utilities"><meta name="groc-project-path" content="src\utilities.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src\utilities.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">isRunning</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;is-running&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method convertToMoveObject</span></p>
+
+<p>Converts a move string to a move object. For the format of the move string and
+structure of the move object see
+<a href="https://github.com/jhlywa/chess.js#movemove">this</a>.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>move must be a String.</strong><br/>(The move string)</li>
+</ul>
+
+<p><strong>Returns an Object</strong><br/>(The move object)</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">convertToMoveObject</span><span class="p">(</span><span class="nx">move</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">move</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">move</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="nx">result</span><span class="p">.</span><span class="nx">from</span> <span class="o">=</span> <span class="nx">move</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+    <span class="nx">result</span><span class="p">.</span><span class="nx">to</span> <span class="o">=</span> <span class="nx">move</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">move</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">result</span><span class="p">.</span><span class="nx">promotion</span> <span class="o">=</span> <span class="nx">move</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method convertToMoveString</span></p>
+
+<p>Converts a move object to a move string. For the format of the move string and
+structure of the move object see
+<a href="https://github.com/jhlywa/chess.js#movemove">this</a>.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>move must be an Object.</strong><br/>(The move object)</li>
+</ul>
+
+<p><strong>Returns a String</strong><br/>(The move string)</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">convertToMoveString</span><span class="p">(</span><span class="nx">move</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">move</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">move</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">move</span> <span class="o">||</span> <span class="o">!</span><span class="nx">move</span><span class="p">.</span><span class="nx">from</span> <span class="o">||</span> <span class="o">!</span><span class="nx">move</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="nx">move</span><span class="p">.</span><span class="nx">from</span> <span class="o">+</span> <span class="nx">move</span><span class="p">.</span><span class="nx">to</span> <span class="o">+</span> <span class="p">(</span><span class="nx">move</span><span class="p">.</span><span class="nx">promotion</span> <span class="o">?</span> <span class="nx">move</span><span class="p">.</span><span class="nx">promotion</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method isProcessRunning</span></p>
+
+<p>Takes a nodejs <a href="http://nodejs.org/api/child_process.html">ChildProcess</a> and
+returns true if it is running.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>proc must be an Object.</strong><br/>(A nodejs ChildProcess.)</li>
+</ul>
+
+<p><strong>Returns a Boolean</strong><br/>(true if the process is running, false otherwise.)</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">isProcessRunning</span><span class="p">(</span><span class="nx">proc</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">isRunning</span><span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">pid</span><span class="p">)</span> <span class="o">&amp;&amp;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This is a hack because the isRunning module incorrectly detects
+non-running processes as running. See
+<a href="https://github.com/nisaacson/is-running/issues/4">this issue</a>.</p></div></div><div class="code"><div class="wrapper">           <span class="nx">proc</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">_readableState</span><span class="p">.</span><span class="nx">length</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">exports</span><span class="p">.</span><span class="nx">convertToMoveObject</span> <span class="o">=</span> <span class="nx">convertToMoveObject</span><span class="p">;</span>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">convertToMoveString</span> <span class="o">=</span> <span class="nx">convertToMoveString</span><span class="p">;</span>
+<span class="nx">exports</span><span class="p">.</span><span class="nx">isProcessRunning</span> <span class="o">=</span> <span class="nx">isProcessRunning</span><span class="p">;</span></div></div></div></div></body></html>

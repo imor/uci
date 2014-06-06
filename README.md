@@ -30,10 +30,10 @@ engine.runProcess().then(function () {
     return engine.positionCommand('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 }).then(function () {
     console.log('Starting position set');
+	console.log('Starting analysis');
     return engine.goInfiniteCommand(function infoHandler(info) {
         console.log(info);
     });
-    console.log('Starting analysis');
 }).delay(2000).then(function () {
     console.log('Stopping analysis');
     return engine.stopCommand();
@@ -50,7 +50,7 @@ engine.runProcess().then(function () {
 ```
 ## API
 
-See [here]() for API reference.
+See [here](http://imor.github.io/uci/docs/src/main.html) for API reference.
 
 ## Contributing
 Fork, pick an issue to fix from [issues](https://github.com/imor/uci/issues) or

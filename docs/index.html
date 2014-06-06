@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="en"><head><title>index</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content=""><meta name="groc-document-path" content="index"><meta name="groc-project-path" content="README.md"><link rel="stylesheet" type="text/css" media="all" href="assets/style.css"><script type="text/javascript" src="assets/behavior.js"></script><body><div id="meta"><div class="file-path">README.md</div></div><div id="document"><div class="segment"><div class="comments "><div class="wrapper"><h1 id="uci">UCI</h1>
+
+<p>NOTE:This version is not backwards compatible with 0.2.x series of releases.</p>
+
+<p>UCI is a thin wrapper on a <a href="http://en.wikipedia.org/wiki/Universal_Chess_Interface">uci
+interface</a> chess engine.</p>
+
+<h2 id="installation">Installation</h2>
+
+<p>Make sure you have <a href="http://nodejs.org/">node.js</a> installed. Then do:</p>
+
+<pre><code>$ npm install uci
+</code></pre>
+
+<h2 id="example">Example</h2>
+
+<pre><code class="js">var Engine = require('uci');
+var engine = new Engine('&lt;path to engine executable&gt;');
+engine.runProcess().then(function () {
+    console.log('Started');
+    return engine.uciCommand();
+}).then(function (idAndOptions) {
+    console.log('Engine name - ' + idAndOptions.id.name);
+    return engine.isReadyCommand();
+}).then(function () {
+    console.log('Ready');
+    return engine.uciNewGameCommand();
+}).then(function () {
+    console.log('New game started');
+    return engine.positionCommand('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+}).then(function () {
+    console.log('Starting position set');
+    console.log('Starting analysis');
+    return engine.goInfiniteCommand(function infoHandler(info) {
+        console.log(info);
+    });
+}).delay(2000).then(function () {
+    console.log('Stopping analysis');
+    return engine.stopCommand();
+}).then(function (bestmove) {
+    console.log('Bestmove: ');
+    console.log(bestmove);
+    return engine.quitCommand();
+}).then(function () {
+    console.log('Stopped');
+}).fail(function (error) {
+    console.log(error);
+    process.exit();
+}).done();
+</code></pre>
+
+<h2 id="api">API</h2>
+
+<p>See <a href="http://imor.github.io/uci/docs/src/main.html">here</a> for API reference.</p>
+
+<h2 id="contributing">Contributing</h2>
+
+<p>Fork, pick an issue to fix from <a href="https://github.com/imor/uci/issues">issues</a> or
+add a missing feature and send a pull request.</p>
+
+<h2 id="license">License</h2>
+
+<p>UCI is released under the MIT License. See the bundled LICENSE file for details.</p></div></div></div></div></body></html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html><html lang="en"><head><title>src\main</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="src\main"><meta name="groc-project-path" content="src\main.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src\main.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">spawn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;child_process&#39;</span><span class="p">).</span><span class="nx">spawn</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">Q</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">endOfLine</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">).</span><span class="nx">EOL</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">endOfLineRegExp</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">endOfLine</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">S</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">os</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">utilities</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./utilities.js&#39;</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">Engine</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">engineFile</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineFile</span> <span class="o">=</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span><span class="p">(</span><span class="nx">engineFile</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">Engine</span><span class="p">,</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method runProcess</span></p>
+
+<p>This function starts the engine process and returns a promise which is
+resolved or rejected later depending upon whether the process is running or
+not</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">runProcess</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span> <span class="o">=</span> <span class="nx">spawn</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">engineFile</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">timer</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">once</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">timer</span><span class="p">);</span>
+        <span class="nx">deferred</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
+    <span class="p">});</span>
+
+    <span class="nx">timer</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">isProcessRunning</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">timer</span><span class="p">);</span>
+            <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
+        <span class="p">}</span>
+
+    <span class="p">},</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method isReadyCommand</span></p>
+
+<p>This function sends an <em>isready</em> command. It returns a promise which is
+resolved once the engine responds with <em>readyok</em>.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isReadyCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+
+    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;readyok&#39;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+                <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;isready&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method uciCommand</span></p>
+
+<p>This function sends a <em>uci</em> command to the engine. It returns a promise which
+is resolved once the engine responds with <em>uciok</em>.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">uciCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+
+    <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="p">{};</span>
+    <span class="kd">var</span> <span class="nx">nameRegExp</span> <span class="o">=</span> <span class="sr">/id name\s+(.+)/</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">authorRegExp</span> <span class="o">=</span> <span class="sr">/id author\s+(.+)/</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:parse options</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;uciok&#39;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+                <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="o">:</span> <span class="nx">options</span><span class="p">}</span> <span class="p">);</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;option&#39;</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="nx">options</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">nameRegExp</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">id</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                    <span class="p">}</span>
+                    <span class="nx">result</span> <span class="o">=</span> <span class="nx">authorRegExp</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+                        <span class="nx">id</span><span class="p">.</span><span class="nx">author</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;uci&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="commands-without-any-output">Commands without any output</h2>
+
+<p>Not all commands produce an output. Two examples are the <em>position</em> and the
+<em>ucinewgame</em> commands. For such commands how do you know if the engine is
+working on your command or has an infinite loop and is hung forever? You
+don't. As a workaround these commands send an <em>isready</em> command at the end
+which fortunately produces the <em>readyok</em> output.</p></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method setOptionCommand</span></p>
+
+<p>This function sends a <em>setoption name NAME value VALUE</em> command to the engine
+and returns a promise. After this command it also sends a <em>isready</em> command
+and the promise is resolved when the engine produces the <em>readyok</em> string.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>optionName must be a String.</strong><br/>(The name of the option)</p></li>
+<li><p><strong>optionValue must be a String.</strong><br/>(The value of the option)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">setOptionCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">optionName</span><span class="p">,</span> <span class="nx">optionValue</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:parse options from uci command and if option type is button, call the setoption on if optionValue is true</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">command</span> <span class="o">=</span> <span class="s1">&#39;setoption name &#39;</span> <span class="o">+</span> <span class="nx">optionName</span> <span class="o">+</span> <span class="p">(</span><span class="nx">optionValue</span><span class="o">?</span> <span class="p">(</span><span class="s1">&#39; value &#39;</span> <span class="o">+</span> <span class="nx">optionValue</span><span class="p">)</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">command</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method uciNewGameCommand</span></p>
+
+<p>This function sends a <em>ucinewgame</em> command to the engine and returns a
+promise. After this command it also sends a <em>isready</em> command and the promise
+is resolved when the engine produces the <em>readyok</em> string.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">uciNewGameCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;ucinewgame&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method positionCommand</span></p>
+
+<p>This function sends a <em>position fen FenString</em> command and returns a promise.
+After this command it also sends a <em>isready</em> command and the promise is
+resolved when the engine produces the <em>readyok</em> string.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>fen must be a String.</strong><br/>(The fen string of the position)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">positionCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fen</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;position fen &#39;</span> <span class="o">+</span> <span class="nx">fen</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method timeLimitedGoCommand</span></p>
+
+<p>This function sends a <em>go wtime whiteTime btime blackTime</em> command and returns
+a promise. The promise is resolved when the engine outputs a <em>bestmove</em>.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><p><strong>infoHandler must be a Function.</strong><br/>(A callback taking a string. This will be called for each info line output by the engine.)</p></li>
+<li><p><strong>whiteMillisRemaining must be a Number.</strong><br/>(The remaining time for white in milliseconds)</p></li>
+<li><p><strong>blackMillisRemaining must be a Number.</strong><br/>(The remaining time for black in milliseconds)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">timeLimitedGoCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">infoHandler</span><span class="p">,</span>
+                                                  <span class="nx">whiteMillisRemaining</span><span class="p">,</span>
+                                                  <span class="nx">blackMillisRemaining</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+
+    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">infoHandler</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">infoHandler</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;bestmove&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+                <span class="kd">var</span> <span class="nx">moveRegex</span> <span class="o">=</span> <span class="sr">/bestmove (.*?) /g</span><span class="p">;</span>
+                <span class="kd">var</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">moveRegex</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">convertToMoveObject</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]));</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Invalid format of bestmove. Expected &quot;bestmove &lt;move&gt;&quot;. Returned &quot;&#39;</span> <span class="o">+</span> <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">commandString</span> <span class="o">=</span> <span class="s1">&#39;go wtime &#39;</span> <span class="o">+</span> <span class="nx">whiteMillisRemaining</span> <span class="o">+</span> <span class="s1">&#39; btime &#39;</span> <span class="o">+</span> <span class="nx">blackMillisRemaining</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">commandString</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method goInfiniteCommand</span></p>
+
+<p>This function sends the <em>go infinite</em> command and returns a promise. After
+this command it also sends a <em>isready</em> command and the promise is resolved
+when the engine produces the <em>readyok</em> string.</p>
+
+<p>Parameters:</p>
+
+<ul>
+<li><strong>infoHandler must be a Function.</strong><br/>(A callback taking a string. This will be called for each info line output by the engine.)</li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">goInfiniteCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">infoHandler</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">infoHandler</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">infoHandler</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">goInfiniteListener</span> <span class="o">=</span> <span class="nx">engineStdoutListener</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;go infinite&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method stopCommand</span></p>
+
+<p>This function sends the stop command and returns a promise. The promise is
+resolved when the engine outputs a <em>bestmove</em>.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">stopCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+
+    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;bestmove&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">goInfiniteListener</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">goInfiniteListener</span><span class="p">);</span>
+                <span class="p">}</span>
+                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+                <span class="kd">var</span> <span class="nx">moveRegex</span> <span class="o">=</span> <span class="sr">/bestmove (.*?) /g</span><span class="p">;</span>
+                <span class="kd">var</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">moveRegex</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">convertToMoveObject</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]));</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Invalid format of bestmove. Expected &quot;bestmove &lt;move&gt;&quot;. Returned &quot;&#39;</span> <span class="o">+</span> <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">);</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method quitCommand</span></p>
+
+<p>This function sends a <em>quit</em> command. It returns a promise which is resolved
+once the engine process is terminated.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">quitCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+
+    <span class="kd">var</span> <span class="nx">processCloseListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="nx">signal</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="nx">processCloseListener</span><span class="p">);</span>
+        <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s1">&#39;Engine with process id &#39;</span> <span class="o">+</span> <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">pid</span> <span class="o">+</span> <span class="s1">&#39; shutdown successfully&#39;</span><span class="p">);</span>
+    <span class="p">};</span>
+
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="nx">processCloseListener</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;quit&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Engine</span><span class="p">;</span></div></div></div></div></body></html>

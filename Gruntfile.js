@@ -19,7 +19,7 @@ module.exports = function(grunt) {
         },
         groc: {
             javascript: [
-                "src/*.js"
+                "src/*.js", "README.md"
             ],
             options: {
                 "out": "docs/",
