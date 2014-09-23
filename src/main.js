@@ -149,8 +149,17 @@ Engine.prototype.uciNewGameCommand = function () {
 //@method positionCommand
 //
 //@param  {String}  fen  The fen string of the position
-Engine.prototype.positionCommand = function (fen) {
-    this.engineProcess.stdin.write('position fen ' + fen + endOfLine);
+Engine.prototype.positionCommand = function (fen,moves) {
+    this.engineProcess.stdin.write('position ');
+    if (fen !== '') {
+      this.engineProcess.stdin.write('fen ' + fen);
+    } else {
+      this.engineProcess.stdin.write('startpos');
+    }
+    if (moves !== '') {
+      this.engineProcess.stdin.write(' moves ' + moves);
+    }
+    this.engineProcess.stdin.write(endOfLine);
     return this.isReadyCommand();
 };
 
