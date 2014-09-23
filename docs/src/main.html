@@ -131,9 +131,20 @@ resolved when the engine produces the <em>readyok</em> string.</p>
 <p>Parameters:</p>
 
 <ul>
-<li><strong>fen must be a String.</strong><br/>(The fen string of the position)</li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">positionCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fen</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;position fen &#39;</span> <span class="o">+</span> <span class="nx">fen</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+<li><p><strong>fen must be a String.</strong><br/>(The fen string of the position or the value <em>startpos</em>. <em>startpos</em> will set the starting position.)</p></li>
+<li><p><strong>moves must be a String.</strong><br/>(The moves to play after the position with fen is set.)</p></li>
+</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">positionCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fen</span><span class="p">,</span> <span class="nx">moves</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;position &#39;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">fen</span> <span class="o">===</span> <span class="s1">&#39;startpos&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;startpos&#39;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;fen &#39;</span> <span class="o">+</span> <span class="nx">fen</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="nx">moves</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39; moves &#39;</span> <span class="o">+</span> <span class="nx">moves</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">endOfLine</span><span class="p">);</span>
     <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
 <span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method timeLimitedGoCommand</span></p>
 

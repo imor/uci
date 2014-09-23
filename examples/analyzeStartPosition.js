@@ -11,7 +11,7 @@ engine.runProcess().then(function () {
     return engine.uciNewGameCommand();
 }).then(function () {
     console.log('New game started');
-    return engine.positionCommand('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+    return engine.positionCommand('startpos', 'e2e4 e7e5');
 }).then(function () {
     console.log('Starting position set');
     console.log('Starting analysis');

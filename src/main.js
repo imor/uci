@@ -148,15 +148,18 @@ Engine.prototype.uciNewGameCommand = function () {
 //@public
 //@method positionCommand
 //
-//@param  {String}  fen  The fen string of the position
-Engine.prototype.positionCommand = function (fen,moves) {
+//@param  {String}  fen  The fen string of the position or the value _startpos_.
+//                       _startpos_ will set the starting position.
+//@param  {String}  moves  The moves to play after the position with fen is set.
+Engine.prototype.positionCommand = function (fen, moves) {
     this.engineProcess.stdin.write('position ');
-    if (fen !== '') {
-      this.engineProcess.stdin.write('fen ' + fen);
+    if (fen === 'startpos') {
+        this.engineProcess.stdin.write('startpos');
     } else {
-      this.engineProcess.stdin.write('startpos');
+        this.engineProcess.stdin.write('fen ' + fen);
     }
-    if (moves !== '') {
+
+    if (moves) {
       this.engineProcess.stdin.write(' moves ' + moves);
     }
     this.engineProcess.stdin.write(endOfLine);
