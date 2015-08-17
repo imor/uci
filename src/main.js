@@ -192,7 +192,7 @@ Engine.prototype.timeLimitedGoCommand = function (infoHandler,
                 infoHandler('info', lines[i]);
             } else if (stringifiedLine.startsWith('bestmove')) {
                 self.engineProcess.stdout.removeListener('data', engineStdoutListener);
-                var moveRegex = /bestmove (.*?) /g;
+                var moveRegex = /bestmove (\w+)(.*)?/g;
                 var match = moveRegex.exec(lines[i]);
                 if (match) {
                     deferred.resolve(utilities.convertToMoveObject(match[1]));
@@ -254,7 +254,7 @@ Engine.prototype.stopCommand = function () {
                     self.engineProcess.stdout.removeListener('data', self.goInfiniteListener);
                 }
                 self.engineProcess.stdout.removeListener('data', engineStdoutListener);
-                var moveRegex = /bestmove (.*?) /g;
+                var moveRegex = /bestmove (\w+)(.*)?/g;
                 var match = moveRegex.exec(lines[i]);
                 if (match) {
                     deferred.resolve(utilities.convertToMoveObject(match[1]));
