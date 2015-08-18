@@ -236,6 +236,51 @@ Engine.prototype.goInfiniteCommand = function (infoHandler) {
     return this.isReadyCommand();
 };
 
+//This function sends a _go depth depthValue_ command and returns
+//a promise with data object containing bestmove and score properties.
+//The promise is resolved when the engine outputs a _bestmove_.
+//@public
+//@method goDepthCommand
+//
+//@param  {Number}  depth A value how many half-moves in depth engine
+//have to perform analysis
+//@param  {Function}  infoHandler  A callback taking a string. This will be
+//called for each info line output by the engine.
+Engine.prototype.goDepthCommand = function (depth, infoHandler) {
+    var self = this;
+    var deferred = Q.defer();
+    var lastStdoutLine = "";
+    var engineStdoutListener = function (data) {
+        var lines = data.toString().split(endOfLineRegExp);
+        for (var i = 0; i < lines.length; i++) {
+            var stringifiedLine = S(lines[i]);
+            if (stringifiedLine.startsWith('info') && infoHandler) {
+                infoHandler(lines[i]);
+            } else if (stringifiedLine.startsWith('bestmove')) {
+                self.engineProcess.stdout.removeListener('data', engineStdoutListener);
+                var moveRegex = /bestmove (.*?) /g;
+                var match = moveRegex.exec(lines[i]);
+                if (match) {
+                    var scoreRegex = /(.*?) score cp (.*?) /g;
+                    var matchScore = scoreRegex.exec(lastStdoutLine);
+                    var score = (matchScore) ? matchScore[2] : "";
+                    deferred.resolve({ bestmove: utilities.convertToMoveObject(match[1]), score: score });
+                } else {
+                    throw new Error('Invalid format of bestmove. Expected "bestmove <move>". Returned "' + lines[i] + '"');
+                }
+            }
+            lastStdoutLine = lines[i];
+        }
+    };
+
+    this.engineProcess.stdout.on('data', engineStdoutListener);
+    var commandString = 'go depth ' + depth;
+    this.engineProcess.stdin.write(commandString + endOfLine);
+
+    return deferred.promise;
+};
+
+
 //This function sends the stop command and returns a promise. The promise is
 //resolved when the engine outputs a _bestmove_.
 //@public
