@@ -5,7 +5,6 @@ var util = require('util');
 var spawn = require('child_process').spawn;
 var Q = require('q');
 var endOfLine = require('os').EOL;
-var endOfLineRegExp = new RegExp(endOfLine);
 var S = require('string');
 var os = require('os');
 var path = require('path');
@@ -42,6 +41,8 @@ Engine.prototype.runProcess = function () {
     return deferred.promise;
 };
 
+
+
 //This function sends an _isready_ command. It returns a promise which is
 //resolved once the engine responds with _readyok_.
 //@public
@@ -49,9 +50,12 @@ Engine.prototype.runProcess = function () {
 Engine.prototype.isReadyCommand = function () {
     var self = this;
     var deferred = Q.defer();
+    var pendingData = "";
 
     var engineStdoutListener = function (data) {
-        var lines = data.toString().split(endOfLineRegExp);
+        var lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
+        lines = lines.lines;
         for (var i = 0; i < lines.length; i++) {
             if (lines[i] === 'readyok') {
                 self.engineProcess.stdout.removeListener('data', engineStdoutListener);
@@ -72,6 +76,7 @@ Engine.prototype.isReadyCommand = function () {
 Engine.prototype.uciCommand = function () {
     var self = this;
     var deferred = Q.defer();
+    var pendingData = "";
 
     var options = [];
     var id = {};
@@ -79,8 +84,9 @@ Engine.prototype.uciCommand = function () {
     var authorRegExp = /id author\s+(.+)/;
     //TODO:parse options
     var engineStdoutListener = function (data) {
-        var lines = data.toString().split(endOfLineRegExp);
-
+        var lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
+        lines = lines.lines;
         for (var i = 0; i < lines.length; i++) {
             if (lines[i] === 'uciok') {
                 self.engineProcess.stdout.removeListener('data', engineStdoutListener);
@@ -182,9 +188,12 @@ Engine.prototype.timeLimitedGoCommand = function (infoHandler,
                                                   blackMillisRemaining) {
     var self = this;
     var deferred = Q.defer();
-
+    var pendingData = "";
+    
     var engineStdoutListener = function (data) {
-        var lines = data.toString().split(endOfLineRegExp);
+        var lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
+        lines = lines.lines;
         for (var i = 0; i < lines.length; i++) {
             //TODO:Parse info and bestmove
             var stringifiedLine = S(lines[i]);
@@ -219,8 +228,12 @@ Engine.prototype.timeLimitedGoCommand = function (infoHandler,
 //@param  {Function}  infoHandler  A callback taking a string. This will be
 //called for each info line output by the engine.
 Engine.prototype.goInfiniteCommand = function (infoHandler) {
+    var pendingData = "";
+    
     var engineStdoutListener = function (data) {
-        var lines = data.toString().split(endOfLineRegExp);
+        var lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
+        lines = lines.lines;
         for (var i = 0; i < lines.length; i++) {
             //TODO:Parse info and bestmove
             var stringifiedLine = S(lines[i]);
@@ -243,9 +256,12 @@ Engine.prototype.goInfiniteCommand = function (infoHandler) {
 Engine.prototype.stopCommand = function () {
     var self = this;
     var deferred = Q.defer();
-
+    var pendingData = "";
+    
     var engineStdoutListener = function (data) {
-        var lines = data.toString().split(endOfLineRegExp);
+        var lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
+        lines = lines.lines;
         for (var i = 0; i < lines.length; i++) {
             //TODO:Parse info and bestmove
             var stringifiedLine = S(lines[i]);
