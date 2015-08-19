@@ -1,4 +1,6 @@
 var isRunning = require('is-running');
+var endOfLine = require('os').EOL;
+var endOfLineRegExp = new RegExp(endOfLine);
 
 //Converts a move string to a move object. For the format of the move string and
 //structure of the move object see
@@ -55,6 +57,26 @@ function isProcessRunning(proc) {
            proc.stdout._readableState.length !== 0;
 }
 
+//Takes a string and returns an object with two attributes - lines and
+//incompleteLine. lines contains all the complete lines and incompleteLine
+//contains any trailing characters without a newline character. E.g. string
+//abc\ndef\nghi will return {lines:['abc','def'],incompleteLine:'ghi'}
+//@public
+//@method getLines
+//
+//@param {String} data String to parse
+//@return {Object} lines object
+function getLines(data) {
+    var lines = data.split(endOfLineRegExp);
+    if (data.lastIndexOf(endOfLine) < data.length - 1) {
+        var incompleteLine = lines.pop();
+        return {lines:lines, incompleteLine:incompleteLine};
+    } else {
+        return {lines:lines};
+    }
+}
+
 exports.convertToMoveObject = convertToMoveObject;
 exports.convertToMoveString = convertToMoveString;
 exports.isProcessRunning = isProcessRunning;
+exports.getLines = getLines;
