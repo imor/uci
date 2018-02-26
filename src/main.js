@@ -263,7 +263,6 @@ Engine.prototype.goCommand = function (commands, infoHandler) {
         }
         inputCommand += endOfLine;
     }
-    console.log(inputCommand);
 
     this.goInfiniteListener = engineStdoutListener;
     this.engineProcess.stdout.on('data', engineStdoutListener);
