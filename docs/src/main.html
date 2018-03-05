@@ -1,259 +1,302 @@
-<!DOCTYPE html><html lang="en"><head><title>src\main</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="src\main"><meta name="groc-project-path" content="src\main.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src\main.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
+<!DOCTYPE html><html lang="en"><head><title>src\main</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="src\main"><meta name="groc-project-path" content="src\main.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src\main.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-pi">'use strict'</span>;
 
-<span class="kd">var</span> <span class="nx">events</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;events&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">util</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;util&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">spawn</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;child_process&#39;</span><span class="p">).</span><span class="nx">spawn</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">Q</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">endOfLine</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">).</span><span class="nx">EOL</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">endOfLineRegExp</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">RegExp</span><span class="p">(</span><span class="nx">endOfLine</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">S</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">os</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;os&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">path</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">);</span>
-<span class="kd">var</span> <span class="nx">utilities</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./utilities.js&#39;</span><span class="p">);</span>
+<span class="hljs-keyword">var</span> events = <span class="hljs-built_in">require</span>(<span class="hljs-string">'events'</span>);
+<span class="hljs-keyword">var</span> util = <span class="hljs-built_in">require</span>(<span class="hljs-string">'util'</span>);
+<span class="hljs-keyword">var</span> spawn = <span class="hljs-built_in">require</span>(<span class="hljs-string">'child_process'</span>).spawn;
+<span class="hljs-keyword">var</span> Q = <span class="hljs-built_in">require</span>(<span class="hljs-string">'q'</span>);
+<span class="hljs-keyword">var</span> endOfLine = <span class="hljs-built_in">require</span>(<span class="hljs-string">'os'</span>).EOL;
+<span class="hljs-keyword">var</span> S = <span class="hljs-built_in">require</span>(<span class="hljs-string">'string'</span>);
+<span class="hljs-keyword">var</span> os = <span class="hljs-built_in">require</span>(<span class="hljs-string">'os'</span>);
+<span class="hljs-keyword">var</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">'path'</span>);
+<span class="hljs-keyword">var</span> utilities = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./utilities.js'</span>);
 
-<span class="kd">var</span> <span class="nx">Engine</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">engineFile</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineFile</span> <span class="o">=</span> <span class="nx">path</span><span class="p">.</span><span class="nx">normalize</span><span class="p">(</span><span class="nx">engineFile</span><span class="p">);</span>
-<span class="p">};</span>
+<span class="hljs-keyword">var</span> Engine = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">engineFile</span>) </span>{
+    <span class="hljs-keyword">this</span>.engineFile = path.normalize(engineFile);
+};
 
-<span class="nx">util</span><span class="p">.</span><span class="nx">inherits</span><span class="p">(</span><span class="nx">Engine</span><span class="p">,</span> <span class="nx">events</span><span class="p">.</span><span class="nx">EventEmitter</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method runProcess</span></p>
-
+util.inherits(Engine, events.EventEmitter);</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method runProcess</span></p>
 <p>This function starts the engine process and returns a promise which is
 resolved or rejected later depending upon whether the process is running or
-not</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">runProcess</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span> <span class="o">=</span> <span class="nx">spawn</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">engineFile</span><span class="p">);</span>
-    <span class="kd">var</span> <span class="nx">timer</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">once</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">error</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">timer</span><span class="p">);</span>
-        <span class="nx">deferred</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="nx">error</span><span class="p">);</span>
-    <span class="p">});</span>
+not</p></div></div><div class="code"><div class="wrapper">Engine.prototype.runProcess = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">var</span> deferred = Q.defer();
+    <span class="hljs-keyword">this</span>.engineProcess = spawn(<span class="hljs-keyword">this</span>.engineFile);
+    <span class="hljs-keyword">var</span> timer;
+    <span class="hljs-keyword">this</span>.engineProcess.once(<span class="hljs-string">'error'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) </span>{
+        clearInterval(timer);
+        deferred.reject(error);
+    });
 
-    <span class="nx">timer</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">isProcessRunning</span><span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">))</span> <span class="p">{</span>
-            <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">timer</span><span class="p">);</span>
-            <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
-        <span class="p">}</span>
+    timer = setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">if</span> (utilities.isProcessRunning(self.engineProcess)) {
+            clearInterval(timer);
+            deferred.resolve();
+        }
 
-    <span class="p">},</span> <span class="mi">100</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method isReadyCommand</span></p>
-
+    }, <span class="hljs-number">100</span>);
+    <span class="hljs-keyword">return</span> deferred.promise;
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method isReadyCommand</span></p>
 <p>This function sends an <em>isready</em> command. It returns a promise which is
-resolved once the engine responds with <em>readyok</em>.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">isReadyCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+resolved once the engine responds with <em>readyok</em>.</p></div></div><div class="code"><div class="wrapper">Engine.prototype.isReadyCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">var</span> deferred = Q.defer();
+    <span class="hljs-keyword">var</span> pendingData = <span class="hljs-string">""</span>;
 
-    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;readyok&#39;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-                <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
+    <span class="hljs-keyword">var</span> engineStdoutListener = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+        <span class="hljs-keyword">var</span> lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : <span class="hljs-string">""</span>;
+        lines = lines.lines;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; lines.length; i++) {
+            <span class="hljs-keyword">if</span> (lines[i] === <span class="hljs-string">'readyok'</span>) {
+                self.engineProcess.stdout.removeListener(<span class="hljs-string">'data'</span>, engineStdoutListener);
+                deferred.resolve();
+            }
+        }
+    };
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;isready&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method uciCommand</span></p>
-
+    <span class="hljs-keyword">this</span>.engineProcess.stdout.on(<span class="hljs-string">'data'</span>, engineStdoutListener);
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'isready'</span> + endOfLine);
+    <span class="hljs-keyword">return</span> deferred.promise;
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method uciCommand</span></p>
 <p>This function sends a <em>uci</em> command to the engine. It returns a promise which
-is resolved once the engine responds with <em>uciok</em>.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">uciCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+is resolved once the engine responds with <em>uciok</em>.</p></div></div><div class="code"><div class="wrapper">Engine.prototype.uciCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">var</span> deferred = Q.defer();
+    <span class="hljs-keyword">var</span> pendingData = <span class="hljs-string">""</span>;
 
-    <span class="kd">var</span> <span class="nx">options</span> <span class="o">=</span> <span class="p">[];</span>
-    <span class="kd">var</span> <span class="nx">id</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="kd">var</span> <span class="nx">nameRegExp</span> <span class="o">=</span> <span class="sr">/id name\s+(.+)/</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">authorRegExp</span> <span class="o">=</span> <span class="sr">/id author\s+(.+)/</span><span class="p">;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:parse options</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
+    <span class="hljs-keyword">var</span> options = [];
+    <span class="hljs-keyword">var</span> id = {};
+    <span class="hljs-keyword">var</span> nameRegExp = <span class="hljs-regexp">/id name\s+(.+)/</span>;
+    <span class="hljs-keyword">var</span> authorRegExp = <span class="hljs-regexp">/id author\s+(.+)/</span>;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:parse options</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">var</span> engineStdoutListener = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+        <span class="hljs-keyword">var</span> lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : <span class="hljs-string">""</span>;
+        lines = lines.lines;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; lines.length; i++) {
+            <span class="hljs-keyword">if</span> (lines[i] === <span class="hljs-string">'uciok'</span>) {
+                self.engineProcess.stdout.removeListener(<span class="hljs-string">'data'</span>, engineStdoutListener);
+                deferred.resolve( {id: id, options: options} );
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">var</span> stringifiedLine = S(lines[i]);
+                <span class="hljs-keyword">if</span> (stringifiedLine.startsWith(<span class="hljs-string">'option'</span>)) {
+                    options.push(lines[i]);
+                } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (stringifiedLine.startsWith(<span class="hljs-string">'id'</span>)) {
+                    <span class="hljs-keyword">var</span> result = nameRegExp.exec(lines[i]);
+                    <span class="hljs-keyword">if</span> (result) {
+                        id.name = result[<span class="hljs-number">1</span>];
+                    }
+                    result = authorRegExp.exec(lines[i]);
+                    <span class="hljs-keyword">if</span> (result) {
+                        id.author = result[<span class="hljs-number">1</span>];
+                    }
+                }
+            }
+        }
+    };
 
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;uciok&#39;</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-                <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span> <span class="p">{</span><span class="nx">id</span><span class="o">:</span> <span class="nx">id</span><span class="p">,</span> <span class="nx">options</span><span class="o">:</span> <span class="nx">options</span><span class="p">}</span> <span class="p">);</span>
-            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;option&#39;</span><span class="p">))</span> <span class="p">{</span>
-                    <span class="nx">options</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">))</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="nx">nameRegExp</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">id</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
-                    <span class="p">}</span>
-                    <span class="nx">result</span> <span class="o">=</span> <span class="nx">authorRegExp</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
-                        <span class="nx">id</span><span class="p">.</span><span class="nx">author</span> <span class="o">=</span> <span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
-                    <span class="p">}</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;uci&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="commands-without-any-output">Commands without any output</h2>
-
+    <span class="hljs-keyword">this</span>.engineProcess.stdout.on(<span class="hljs-string">'data'</span>, engineStdoutListener);
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'uci'</span> + endOfLine);
+    <span class="hljs-keyword">return</span> deferred.promise;
+};</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><h2 id="commands-without-any-output">Commands without any output</h2>
 <p>Not all commands produce an output. Two examples are the <em>position</em> and the
 <em>ucinewgame</em> commands. For such commands how do you know if the engine is
 working on your command or has an infinite loop and is hung forever? You
-don't. As a workaround these commands send an <em>isready</em> command at the end
+don&#39;t. As a workaround these commands send an <em>isready</em> command at the end
 which fortunately produces the <em>readyok</em> output.</p></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method setOptionCommand</span></p>
-
 <p>This function sends a <em>setoption name NAME value VALUE</em> command to the engine
 and returns a promise. After this command it also sends a <em>isready</em> command
 and the promise is resolved when the engine produces the <em>readyok</em> string.</p>
-
 <p>Parameters:</p>
-
 <ul>
-<li><p><strong>optionName must be a String.</strong><br/>(The name of the option)</p></li>
-<li><p><strong>optionValue must be a String.</strong><br/>(The value of the option)</p></li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">setOptionCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">optionName</span><span class="p">,</span> <span class="nx">optionValue</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:parse options from uci command and if option type is button, call the setoption on if optionValue is true</p></div></div><div class="code"><div class="wrapper">    <span class="kd">var</span> <span class="nx">command</span> <span class="o">=</span> <span class="s1">&#39;setoption name &#39;</span> <span class="o">+</span> <span class="nx">optionName</span> <span class="o">+</span> <span class="p">(</span><span class="nx">optionValue</span><span class="o">?</span> <span class="p">(</span><span class="s1">&#39; value &#39;</span> <span class="o">+</span> <span class="nx">optionValue</span><span class="p">)</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">command</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method uciNewGameCommand</span></p>
-
+<li><p><strong>optionName must be a String.</strong><br/>(The name of the option)</p>
+</li>
+<li><p><strong>optionValue must be a String.</strong><br/>(The value of the option)</p>
+</li>
+</ul></div></div><div class="code"><div class="wrapper">Engine.prototype.setOptionCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">optionName, optionValue</span>) </span>{</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:parse options from uci command and if option type is button, call the setoption on if optionValue is true</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">var</span> command = <span class="hljs-string">'setoption name '</span> + optionName + (optionValue? (<span class="hljs-string">' value '</span> + optionValue) : <span class="hljs-string">''</span>) + endOfLine;
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(command);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.isReadyCommand();
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method uciNewGameCommand</span></p>
 <p>This function sends a <em>ucinewgame</em> command to the engine and returns a
 promise. After this command it also sends a <em>isready</em> command and the promise
-is resolved when the engine produces the <em>readyok</em> string.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">uciNewGameCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;ucinewgame&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method positionCommand</span></p>
-
+is resolved when the engine produces the <em>readyok</em> string.</p></div></div><div class="code"><div class="wrapper">Engine.prototype.uciNewGameCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'ucinewgame'</span> + endOfLine);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.isReadyCommand();
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method positionCommand</span></p>
 <p>This function sends a <em>position fen FenString</em> command and returns a promise.
 After this command it also sends a <em>isready</em> command and the promise is
 resolved when the engine produces the <em>readyok</em> string.</p>
-
 <p>Parameters:</p>
-
 <ul>
-<li><p><strong>fen must be a String.</strong><br/>(The fen string of the position or the value <em>startpos</em>. <em>startpos</em> will set the starting position.)</p></li>
-<li><p><strong>moves must be a String.</strong><br/>(The moves to play after the position with fen is set.)</p></li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">positionCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">fen</span><span class="p">,</span> <span class="nx">moves</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;position &#39;</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">fen</span> <span class="o">===</span> <span class="s1">&#39;startpos&#39;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;startpos&#39;</span><span class="p">);</span>
-    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-        <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;fen &#39;</span> <span class="o">+</span> <span class="nx">fen</span><span class="p">);</span>
-    <span class="p">}</span>
-    
-    <span class="k">if</span> <span class="p">(</span><span class="nx">moves</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39; moves &#39;</span> <span class="o">+</span> <span class="nx">moves</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">endOfLine</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method timeLimitedGoCommand</span></p>
+<li><p><strong>fen must be a String.</strong><br/>(The fen string of the position or the value <em>startpos</em>. <em>startpos</em> will set the starting position.)</p>
+</li>
+<li><p><strong>moves must be a String.</strong><br/>(The moves to play after the position with fen is set.)</p>
+</li>
+</ul></div></div><div class="code"><div class="wrapper">Engine.prototype.positionCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">fen, moves</span>) </span>{
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'position '</span>);
+    <span class="hljs-keyword">if</span> (fen === <span class="hljs-string">'startpos'</span>) {
+        <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'startpos'</span>);
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'fen '</span> + fen);
+    }
 
+    <span class="hljs-keyword">if</span> (moves) {
+      <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">' moves '</span> + moves);
+    }
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(endOfLine);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.isReadyCommand();
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method timeLimitedGoCommand</span></p>
 <p>This function sends a <em>go wtime whiteTime btime blackTime</em> command and returns
 a promise. The promise is resolved when the engine outputs a <em>bestmove</em>.</p>
-
 <p>Parameters:</p>
-
 <ul>
-<li><p><strong>infoHandler must be a Function.</strong><br/>(A callback taking a string. This will be called for each info line output by the engine.)</p></li>
-<li><p><strong>whiteMillisRemaining must be a Number.</strong><br/>(The remaining time for white in milliseconds)</p></li>
-<li><p><strong>blackMillisRemaining must be a Number.</strong><br/>(The remaining time for black in milliseconds)</p></li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">timeLimitedGoCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">infoHandler</span><span class="p">,</span>
-                                                  <span class="nx">whiteMillisRemaining</span><span class="p">,</span>
-                                                  <span class="nx">blackMillisRemaining</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+<li><p><strong>infoHandler must be a Function.</strong><br/>(A callback taking a string. This will be called for each info line output by the engine.)</p>
+</li>
+<li><p><strong>whiteMillisRemaining must be a Number.</strong><br/>(The remaining time for white in milliseconds)</p>
+</li>
+<li><p><strong>blackMillisRemaining must be a Number.</strong><br/>(The remaining time for black in milliseconds)</p>
+</li>
+</ul></div></div><div class="code"><div class="wrapper">Engine.prototype.timeLimitedGoCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">infoHandler,
+                                                  whiteMillisRemaining,
+                                                  blackMillisRemaining</span>) </span>{
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">var</span> deferred = Q.defer();
+    <span class="hljs-keyword">var</span> pendingData = <span class="hljs-string">""</span>;
+    
+    <span class="hljs-keyword">var</span> engineStdoutListener = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+        <span class="hljs-keyword">var</span> lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : <span class="hljs-string">""</span>;
+        lines = lines.lines;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; lines.length; i++) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="hljs-keyword">var</span> stringifiedLine = S(lines[i]);
+            <span class="hljs-keyword">if</span> (stringifiedLine.startsWith(<span class="hljs-string">'info'</span>) &amp;&amp; infoHandler) {
+                infoHandler(<span class="hljs-string">'info'</span>, lines[i]);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (stringifiedLine.startsWith(<span class="hljs-string">'bestmove'</span>)) {
+                self.engineProcess.stdout.removeListener(<span class="hljs-string">'data'</span>, engineStdoutListener);
+                <span class="hljs-keyword">var</span> moveRegex = <span class="hljs-regexp">/bestmove (.*?) /g</span>;
+                <span class="hljs-keyword">var</span> match = moveRegex.exec(lines[i]);
+                <span class="hljs-keyword">if</span> (match) {
+                    deferred.resolve(utilities.convertToMoveObject(match[<span class="hljs-number">1</span>]));
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid format of bestmove. Expected "bestmove &lt;move&gt;". Returned "'</span> + lines[i] + <span class="hljs-string">'"'</span>);
+                }
+            }
+        }
+    };
 
-    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">infoHandler</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">infoHandler</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-            <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;bestmove&#39;</span><span class="p">))</span> <span class="p">{</span>
-                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-                <span class="kd">var</span> <span class="nx">moveRegex</span> <span class="o">=</span> <span class="sr">/bestmove (.*?) /g</span><span class="p">;</span>
-                <span class="kd">var</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">moveRegex</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">convertToMoveObject</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]));</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Invalid format of bestmove. Expected &quot;bestmove &lt;move&gt;&quot;. Returned &quot;&#39;</span> <span class="o">+</span> <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">);</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
+    <span class="hljs-keyword">this</span>.engineProcess.stdout.on(<span class="hljs-string">'data'</span>, engineStdoutListener);
+    <span class="hljs-keyword">var</span> commandString = <span class="hljs-string">'go wtime '</span> + whiteMillisRemaining + <span class="hljs-string">' btime '</span> + blackMillisRemaining;
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(commandString + endOfLine);
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-    <span class="kd">var</span> <span class="nx">commandString</span> <span class="o">=</span> <span class="s1">&#39;go wtime &#39;</span> <span class="o">+</span> <span class="nx">whiteMillisRemaining</span> <span class="o">+</span> <span class="s1">&#39; btime &#39;</span> <span class="o">+</span> <span class="nx">blackMillisRemaining</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">commandString</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
+    <span class="hljs-keyword">return</span> deferred.promise;
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method goCommand</span></p>
+<p>This function sends the <em>go</em> command and returns a promise. After
+this command it also sends a <em>isready</em> command and the promise is resolved
+when the engine produces the <em>readyok</em> string.</p>
+<p>Parameters:</p>
+<ul>
+<li><p><strong>commands must be an Object.</strong><br/>(Key-value pairs of commands that can follow the main <em>go</em> command (e.g. <em>searchmoves</em>, <em>infinite</em>, etc.).)</p>
+</li>
+<li><p><strong>infoHandler must be a Function.</strong><br/>(A callback taking a string. This will be called for each info line output by the engine.)</p>
+</li>
+</ul></div></div><div class="code"><div class="wrapper">Engine.prototype.goCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">commands, infoHandler</span>) </span>{
+    <span class="hljs-keyword">var</span> pendingData = <span class="hljs-string">""</span>;
+    
+    <span class="hljs-keyword">var</span> engineStdoutListener = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+        <span class="hljs-keyword">var</span> lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : <span class="hljs-string">""</span>;
+        lines = lines.lines;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; lines.length; i++) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="hljs-keyword">var</span> stringifiedLine = S(lines[i]);
+            <span class="hljs-keyword">if</span> (stringifiedLine.startsWith(<span class="hljs-string">'info'</span>) &amp;&amp; infoHandler) {
+                infoHandler(lines[i]);
+            }
+        }
+    };</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>create input command</p></div></div><div class="code"><div class="wrapper">    <span class="hljs-keyword">var</span> inputCommand = <span class="hljs-string">'go'</span>;
+    <span class="hljs-keyword">if</span> (commands === <span class="hljs-literal">null</span>) {
+        inputCommand += endOfLine;
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> command <span class="hljs-keyword">in</span> commands) {
+            <span class="hljs-keyword">if</span> (commands.hasOwnProperty(command)) {
+                inputCommand += <span class="hljs-string">' '</span> + command;
+                <span class="hljs-keyword">var</span> value = commands[command];</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>e.g. { &#39;infinite&#39;: null, ... }</p></div></div><div class="code"><div class="wrapper">                <span class="hljs-keyword">if</span> (value !== <span class="hljs-literal">null</span> &amp;&amp; value !== <span class="hljs-string">''</span>) {
+                    inputCommand += <span class="hljs-string">' '</span> + value;
+                }
+            }
+        }
+        inputCommand += endOfLine;
+    }
 
-    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method goInfiniteCommand</span></p>
-
+    <span class="hljs-keyword">this</span>.goInfiniteListener = engineStdoutListener;
+    <span class="hljs-keyword">this</span>.engineProcess.stdout.on(<span class="hljs-string">'data'</span>, engineStdoutListener);
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(inputCommand);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.isReadyCommand();
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method goInfiniteCommand</span></p>
 <p>This function sends the <em>go infinite</em> command and returns a promise. After
 this command it also sends a <em>isready</em> command and the promise is resolved
 when the engine produces the <em>readyok</em> string.</p>
-
 <p>Parameters:</p>
-
 <ul>
 <li><strong>infoHandler must be a Function.</strong><br/>(A callback taking a string. This will be called for each info line output by the engine.)</li>
-</ul></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">goInfiniteCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">infoHandler</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">infoHandler</span><span class="p">)</span> <span class="p">{</span>
-                <span class="nx">infoHandler</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
+</ul></div></div><div class="code"><div class="wrapper">Engine.prototype.goInfiniteCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">infoHandler</span>) </span>{
+    <span class="hljs-keyword">var</span> pendingData = <span class="hljs-string">""</span>;
+    
+    <span class="hljs-keyword">var</span> engineStdoutListener = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+        <span class="hljs-keyword">var</span> lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : <span class="hljs-string">""</span>;
+        lines = lines.lines;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; lines.length; i++) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="hljs-keyword">var</span> stringifiedLine = S(lines[i]);
+            <span class="hljs-keyword">if</span> (stringifiedLine.startsWith(<span class="hljs-string">'info'</span>) &amp;&amp; infoHandler) {
+                infoHandler(lines[i]);
+            }
+        }
+    };
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">goInfiniteListener</span> <span class="o">=</span> <span class="nx">engineStdoutListener</span><span class="p">;</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;go infinite&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
-    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">isReadyCommand</span><span class="p">();</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method stopCommand</span></p>
-
+    <span class="hljs-keyword">this</span>.goInfiniteListener = engineStdoutListener;
+    <span class="hljs-keyword">this</span>.engineProcess.stdout.on(<span class="hljs-string">'data'</span>, engineStdoutListener);
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'go infinite'</span> + endOfLine);
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.isReadyCommand();
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method stopCommand</span></p>
 <p>This function sends the stop command and returns a promise. The promise is
-resolved when the engine outputs a <em>bestmove</em>.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">stopCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+resolved when the engine outputs a <em>bestmove</em>.</p></div></div><div class="code"><div class="wrapper">Engine.prototype.stopCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">var</span> deferred = Q.defer();
+    <span class="hljs-keyword">var</span> pendingData = <span class="hljs-string">""</span>;
+    
+    <span class="hljs-keyword">var</span> engineStdoutListener = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+        <span class="hljs-keyword">var</span> lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : <span class="hljs-string">""</span>;
+        lines = lines.lines;
+        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; lines.length; i++) {</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="hljs-keyword">var</span> stringifiedLine = S(lines[i]);
+            <span class="hljs-keyword">if</span> (stringifiedLine.startsWith(<span class="hljs-string">'bestmove'</span>)) {
+                <span class="hljs-keyword">if</span> (self.goInfiniteListener) {
+                    self.engineProcess.stdout.removeListener(<span class="hljs-string">'data'</span>, self.goInfiniteListener);
+                }
+                self.engineProcess.stdout.removeListener(<span class="hljs-string">'data'</span>, engineStdoutListener);
+                <span class="hljs-keyword">var</span> moveRegex = <span class="hljs-regexp">/bestmove (.*?) /g</span>;
+                <span class="hljs-keyword">var</span> match = moveRegex.exec(lines[i]);
+                <span class="hljs-keyword">if</span> (match) {
+                    deferred.resolve(utilities.convertToMoveObject(match[<span class="hljs-number">1</span>]));
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Invalid format of bestmove. Expected "bestmove &lt;move&gt;". Returned "'</span> + lines[i] + <span class="hljs-string">'"'</span>);
+                }
+            }
+        }
+    };
 
-    <span class="kd">var</span> <span class="nx">engineStdoutListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">var</span> <span class="nx">lines</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="nx">endOfLineRegExp</span><span class="p">);</span>
-        <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">lines</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>TODO:Parse info and bestmove</p></div></div><div class="code"><div class="wrapper">            <span class="kd">var</span> <span class="nx">stringifiedLine</span> <span class="o">=</span> <span class="nx">S</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nx">stringifiedLine</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;bestmove&#39;</span><span class="p">))</span> <span class="p">{</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nx">self</span><span class="p">.</span><span class="nx">goInfiniteListener</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">self</span><span class="p">.</span><span class="nx">goInfiniteListener</span><span class="p">);</span>
-                <span class="p">}</span>
-                <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-                <span class="kd">var</span> <span class="nx">moveRegex</span> <span class="o">=</span> <span class="sr">/bestmove (.*?) /g</span><span class="p">;</span>
-                <span class="kd">var</span> <span class="nx">match</span> <span class="o">=</span> <span class="nx">moveRegex</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nx">match</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">utilities</span><span class="p">.</span><span class="nx">convertToMoveObject</span><span class="p">(</span><span class="nx">match</span><span class="p">[</span><span class="mi">1</span><span class="p">]));</span>
-                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-                    <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">&#39;Invalid format of bestmove. Expected &quot;bestmove &lt;move&gt;&quot;. Returned &quot;&#39;</span> <span class="o">+</span> <span class="nx">lines</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">);</span>
-                <span class="p">}</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    <span class="p">};</span>
-
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nx">engineStdoutListener</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;stop&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
-<span class="p">};</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method quitCommand</span></p>
-
+    <span class="hljs-keyword">this</span>.engineProcess.stdout.on(<span class="hljs-string">'data'</span>, engineStdoutListener);
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'stop'</span> + endOfLine);
+    <span class="hljs-keyword">return</span> deferred.promise;
+};</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method quitCommand</span></p>
 <p>This function sends a <em>quit</em> command. It returns a promise which is resolved
-once the engine process is terminated.</p></div></div><div class="code"><div class="wrapper"><span class="nx">Engine</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">quitCommand</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-    <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
-    <span class="kd">var</span> <span class="nx">deferred</span> <span class="o">=</span> <span class="nx">Q</span><span class="p">.</span><span class="nx">defer</span><span class="p">();</span>
+once the engine process is terminated.</p></div></div><div class="code"><div class="wrapper">Engine.prototype.quitCommand = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+    <span class="hljs-keyword">var</span> self = <span class="hljs-keyword">this</span>;
+    <span class="hljs-keyword">var</span> deferred = Q.defer();
 
-    <span class="kd">var</span> <span class="nx">processCloseListener</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">code</span><span class="p">,</span> <span class="nx">signal</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">removeListener</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="nx">processCloseListener</span><span class="p">);</span>
-        <span class="nx">deferred</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="s1">&#39;Engine with process id &#39;</span> <span class="o">+</span> <span class="nx">self</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">pid</span> <span class="o">+</span> <span class="s1">&#39; shutdown successfully&#39;</span><span class="p">);</span>
-    <span class="p">};</span>
+    <span class="hljs-keyword">var</span> processCloseListener = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">code, signal</span>) </span>{
+        self.engineProcess.removeListener(<span class="hljs-string">'close'</span>, processCloseListener);
+        deferred.resolve(<span class="hljs-string">'Engine with process id '</span> + self.engineProcess.pid + <span class="hljs-string">' shutdown successfully'</span>);
+    };
 
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span> <span class="nx">processCloseListener</span><span class="p">);</span>
-    <span class="k">this</span><span class="p">.</span><span class="nx">engineProcess</span><span class="p">.</span><span class="nx">stdin</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="s1">&#39;quit&#39;</span> <span class="o">+</span> <span class="nx">endOfLine</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nx">deferred</span><span class="p">.</span><span class="nx">promise</span><span class="p">;</span>
-<span class="p">};</span>
+    <span class="hljs-keyword">this</span>.engineProcess.on(<span class="hljs-string">'close'</span>, processCloseListener);
+    <span class="hljs-keyword">this</span>.engineProcess.stdin.write(<span class="hljs-string">'quit'</span> + endOfLine);
+    <span class="hljs-keyword">return</span> deferred.promise;
+};
 
-<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="nx">Engine</span><span class="p">;</span></div></div></div></div></body></html>
+<span class="hljs-built_in">module</span>.exports = Engine;</div></div></div></div></body></html>

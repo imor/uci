@@ -1,7 +1,7 @@
 {
   "name": "uci",
   "main": "./src/main.js",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "Raminder Singh <romi_ssk@yahoo.co.in>",
   "description": "A thin wrapper on a UCI chess engine",
   "homepage": "http://imor.github.io/uci/docs/src/main.html",
@@ -23,9 +23,9 @@
     "node": ">=0.10"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.6.4",
-    "grunt-cafe-mocha": "~0.1.9",
-    "grunt-groc": "~0.4.0"
+    "grunt": "^0.4.5",
+    "grunt-cafe-mocha": "^0.1.13",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-groc": "^0.7.1"
   }
 }

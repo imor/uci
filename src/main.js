@@ -219,6 +219,57 @@ Engine.prototype.timeLimitedGoCommand = function (infoHandler,
     return deferred.promise;
 };
 
+//This function sends the _go_ command and returns a promise. After
+//this command it also sends a _isready_ command and the promise is resolved
+//when the engine produces the _readyok_ string.
+//@public
+//@method goCommand
+//
+//@param  {Object}    commands     Key-value pairs of commands that can follow
+//the main _go_ command (e.g. _searchmoves_, _infinite_, etc.).
+//@param  {Function}  infoHandler  A callback taking a string. This will be
+//called for each info line output by the engine.
+Engine.prototype.goCommand = function (commands, infoHandler) {
+    var pendingData = "";
+    
+    var engineStdoutListener = function (data) {
+        var lines = utilities.getLines(pendingData+data);
+        pendingData = lines.incompleteLine ? lines.incompleteLine : "";
+        lines = lines.lines;
+        for (var i = 0; i < lines.length; i++) {
+            //TODO:Parse info and bestmove
+            var stringifiedLine = S(lines[i]);
+            if (stringifiedLine.startsWith('info') && infoHandler) {
+                infoHandler(lines[i]);
+            }
+        }
+    };
+
+    // create input command
+    var inputCommand = 'go';
+    if (commands === null) {
+        inputCommand += endOfLine;
+    } else {
+        for (var command in commands) {
+            if (commands.hasOwnProperty(command)) {
+                inputCommand += ' ' + command;
+                var value = commands[command];
+
+                // e.g. { 'infinite': null, ... }
+                if (value !== null && value !== '') {
+                    inputCommand += ' ' + value;
+                }
+            }
+        }
+        inputCommand += endOfLine;
+    }
+
+    this.goInfiniteListener = engineStdoutListener;
+    this.engineProcess.stdout.on('data', engineStdoutListener);
+    this.engineProcess.stdin.write(inputCommand);
+    return this.isReadyCommand();
+};
+
 //This function sends the _go infinite_ command and returns a promise. After
 //this command it also sends a _isready_ command and the promise is resolved
 //when the engine produces the _readyok_ string.

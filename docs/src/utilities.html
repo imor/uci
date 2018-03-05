@@ -1,64 +1,72 @@
-<!DOCTYPE html><html lang="en"><head><title>src\utilities</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="src\utilities"><meta name="groc-project-path" content="src\utilities.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src\utilities.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="kd">var</span> <span class="nx">isRunning</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;is-running&#39;</span><span class="p">);</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method convertToMoveObject</span></p>
-
+<!DOCTYPE html><html lang="en"><head><title>src\utilities</title></head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0"><meta name="groc-relative-root" content="../"><meta name="groc-document-path" content="src\utilities"><meta name="groc-project-path" content="src\utilities.js"><link rel="stylesheet" type="text/css" media="all" href="../assets/style.css"><script type="text/javascript" src="../assets/behavior.js"></script><body><div id="meta"><div class="file-path">src\utilities.js</div></div><div id="document"><div class="segment"><div class="code"><div class="wrapper"><span class="hljs-keyword">var</span> isRunning = <span class="hljs-built_in">require</span>(<span class="hljs-string">'is-running'</span>);
+<span class="hljs-keyword">var</span> endOfLine = <span class="hljs-built_in">require</span>(<span class="hljs-string">'os'</span>).EOL;
+<span class="hljs-keyword">var</span> endOfLineRegExp = <span class="hljs-keyword">new</span> <span class="hljs-built_in">RegExp</span>(endOfLine);</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method convertToMoveObject</span></p>
 <p>Converts a move string to a move object. For the format of the move string and
 structure of the move object see
 <a href="https://github.com/jhlywa/chess.js#movemove">this</a>.</p>
-
 <p>Parameters:</p>
-
 <ul>
 <li><strong>move must be a String.</strong><br/>(The move string)</li>
 </ul>
-
-<p><strong>Returns an Object</strong><br/>(The move object)</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">convertToMoveObject</span><span class="p">(</span><span class="nx">move</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">move</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">move</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="kd">var</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{};</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">from</span> <span class="o">=</span> <span class="nx">move</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">to</span> <span class="o">=</span> <span class="nx">move</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">move</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
-        <span class="nx">result</span><span class="p">.</span><span class="nx">promotion</span> <span class="o">=</span> <span class="nx">move</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
-<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method convertToMoveString</span></p>
-
+<p><strong>Returns an Object</strong><br/>(The move object)</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertToMoveObject</span>(<span class="hljs-params">move</span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> move === <span class="hljs-string">'object'</span>) {
+        <span class="hljs-keyword">return</span> move;
+    }
+    <span class="hljs-keyword">var</span> result = {};
+    result.from = move.substring(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>);
+    result.to = move.substring(<span class="hljs-number">2</span>, <span class="hljs-number">4</span>);
+    <span class="hljs-keyword">if</span> (move.length &gt; <span class="hljs-number">4</span>) {
+        result.promotion = move.substring(<span class="hljs-number">4</span>);
+    }
+    <span class="hljs-keyword">return</span> result;
+}</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method convertToMoveString</span></p>
 <p>Converts a move object to a move string. For the format of the move string and
 structure of the move object see
 <a href="https://github.com/jhlywa/chess.js#movemove">this</a>.</p>
-
 <p>Parameters:</p>
-
 <ul>
 <li><strong>move must be an Object.</strong><br/>(The move object)</li>
 </ul>
+<p><strong>Returns a String</strong><br/>(The move string)</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">convertToMoveString</span>(<span class="hljs-params">move</span>) </span>{
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> move === <span class="hljs-string">'string'</span>) {
+        <span class="hljs-keyword">return</span> move;
+    }
+    <span class="hljs-keyword">if</span> (!move || !move.from || !move.to) {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">''</span>;
+    }
 
-<p><strong>Returns a String</strong><br/>(The move string)</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">convertToMoveString</span><span class="p">(</span><span class="nx">move</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">move</span> <span class="o">===</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nx">move</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">move</span> <span class="o">||</span> <span class="o">!</span><span class="nx">move</span><span class="p">.</span><span class="nx">from</span> <span class="o">||</span> <span class="o">!</span><span class="nx">move</span><span class="p">.</span><span class="nx">to</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="nx">move</span><span class="p">.</span><span class="nx">from</span> <span class="o">+</span> <span class="nx">move</span><span class="p">.</span><span class="nx">to</span> <span class="o">+</span> <span class="p">(</span><span class="nx">move</span><span class="p">.</span><span class="nx">promotion</span> <span class="o">?</span> <span class="nx">move</span><span class="p">.</span><span class="nx">promotion</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
-<span class="p">}</span></div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method isProcessRunning</span></p>
-
+    <span class="hljs-keyword">return</span> move.from + move.to + (move.promotion ? move.promotion : <span class="hljs-string">''</span>);
+}</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method isProcessRunning</span></p>
 <p>Takes a nodejs <a href="http://nodejs.org/api/child_process.html">ChildProcess</a> and
 returns true if it is running.</p>
-
 <p>Parameters:</p>
-
 <ul>
 <li><strong>proc must be an Object.</strong><br/>(A nodejs ChildProcess.)</li>
 </ul>
-
-<p><strong>Returns a Boolean</strong><br/>(true if the process is running, false otherwise.)</p></div></div><div class="code"><div class="wrapper"><span class="kd">function</span> <span class="nx">isProcessRunning</span><span class="p">(</span><span class="nx">proc</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">isRunning</span><span class="p">(</span><span class="nx">proc</span><span class="p">.</span><span class="nx">pid</span><span class="p">)</span> <span class="o">&amp;&amp;</span></div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This is a hack because the isRunning module incorrectly detects
+<p><strong>Returns a Boolean</strong><br/>(true if the process is running, false otherwise.)</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">isProcessRunning</span>(<span class="hljs-params">proc</span>) </span>{
+    <span class="hljs-keyword">return</span> isRunning(proc.pid) &amp;&amp;</div></div></div><div class="segment"><div class="comments "><div class="wrapper"><p>This is a hack because the isRunning module incorrectly detects
 non-running processes as running. See
-<a href="https://github.com/nisaacson/is-running/issues/4">this issue</a>.</p></div></div><div class="code"><div class="wrapper">           <span class="nx">proc</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">_readableState</span><span class="p">.</span><span class="nx">length</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<a href="https://github.com/nisaacson/is-running/issues/4">this issue</a>.</p></div></div><div class="code"><div class="wrapper">           proc.stdout._readableState.length !== <span class="hljs-number">0</span>;
+}</div></div></div><div class="segment"><div class="comments doc-section doc-section-public"><div class="wrapper"><p><span class='doc-section-header'>Public method getLines</span></p>
+<p>Takes a string and returns an object with two attributes - lines and
+incompleteLine. lines contains all the complete lines and incompleteLine
+contains any trailing characters without a newline character. E.g. string
+abc\ndef\nghi will return {lines:[&#39;abc&#39;,&#39;def&#39;],incompleteLine:&#39;ghi&#39;}</p>
+<p>Parameters:</p>
+<ul>
+<li><strong>data must be a String.</strong><br/>(String to parse)</li>
+</ul>
+<p><strong>Returns an Object</strong><br/>(lines object)</p></div></div><div class="code"><div class="wrapper"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">getLines</span>(<span class="hljs-params">data</span>) </span>{
+    <span class="hljs-keyword">var</span> lines = data.split(endOfLineRegExp);
+    <span class="hljs-keyword">if</span> (data.lastIndexOf(endOfLine) &lt; data.length - <span class="hljs-number">1</span>) {
+        <span class="hljs-keyword">var</span> incompleteLine = lines.pop();
+        <span class="hljs-keyword">return</span> {lines:lines, incompleteLine:incompleteLine};
+    } <span class="hljs-keyword">else</span> {
+        <span class="hljs-keyword">return</span> {lines:lines};
+    }
+}
 
-<span class="nx">exports</span><span class="p">.</span><span class="nx">convertToMoveObject</span> <span class="o">=</span> <span class="nx">convertToMoveObject</span><span class="p">;</span>
-<span class="nx">exports</span><span class="p">.</span><span class="nx">convertToMoveString</span> <span class="o">=</span> <span class="nx">convertToMoveString</span><span class="p">;</span>
-<span class="nx">exports</span><span class="p">.</span><span class="nx">isProcessRunning</span> <span class="o">=</span> <span class="nx">isProcessRunning</span><span class="p">;</span></div></div></div></div></body></html>
+exports.convertToMoveObject = convertToMoveObject;
+exports.convertToMoveString = convertToMoveString;
+exports.isProcessRunning = isProcessRunning;
+exports.getLines = getLines;</div></div></div></div></body></html>
