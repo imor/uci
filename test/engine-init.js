@@ -55,7 +55,7 @@ var testEcecutableFile = 'test_executable';
 
 
 /**
- * Out subject-under-test.
+ * Our subject-under-test.
  */
 
 var Engine = require('../src/main');
