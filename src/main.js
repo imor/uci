@@ -24,20 +24,29 @@ util.inherits(Engine, events.EventEmitter);
 Engine.prototype.runProcess = function () {
     var self = this;
     var deferred = Q.defer();
-    this.engineProcess = spawn(this.engineFile);
+    var numberOfTriesBeforeTimeout = 10;
+    var currentIntervalNumber = 0
     var timer;
+
+    this.engineProcess = spawn(this.engineFile);
+
     this.engineProcess.once('error', function (error) {
         clearInterval(timer);
         deferred.reject(error);
     });
 
     timer = setInterval(function () {
+        currentIntervalNumber += 1;
+
         if (utilities.isProcessRunning(self.engineProcess)) {
             clearInterval(timer);
             deferred.resolve();
+        } else if (currentIntervalNumber === numberOfTriesBeforeTimeout) {
+            clearInterval(timer);
+            deferred.reject(new Error('timeout while starting process'));
         }
-
     }, 100);
+
     return deferred.promise;
 };
 
@@ -189,7 +198,7 @@ Engine.prototype.timeLimitedGoCommand = function (infoHandler,
     var self = this;
     var deferred = Q.defer();
     var pendingData = "";
-    
+
     var engineStdoutListener = function (data) {
         var lines = utilities.getLines(pendingData+data);
         pendingData = lines.incompleteLine ? lines.incompleteLine : "";
@@ -231,7 +240,7 @@ Engine.prototype.timeLimitedGoCommand = function (infoHandler,
 //called for each info line output by the engine.
 Engine.prototype.goCommand = function (commands, infoHandler) {
     var pendingData = "";
-    
+
     var engineStdoutListener = function (data) {
         var lines = utilities.getLines(pendingData+data);
         pendingData = lines.incompleteLine ? lines.incompleteLine : "";
@@ -280,7 +289,7 @@ Engine.prototype.goCommand = function (commands, infoHandler) {
 //called for each info line output by the engine.
 Engine.prototype.goInfiniteCommand = function (infoHandler) {
     var pendingData = "";
-    
+
     var engineStdoutListener = function (data) {
         var lines = utilities.getLines(pendingData+data);
         pendingData = lines.incompleteLine ? lines.incompleteLine : "";
@@ -308,7 +317,7 @@ Engine.prototype.stopCommand = function () {
     var self = this;
     var deferred = Q.defer();
     var pendingData = "";
-    
+
     var engineStdoutListener = function (data) {
         var lines = utilities.getLines(pendingData+data);
         pendingData = lines.incompleteLine ? lines.incompleteLine : "";
