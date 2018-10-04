@@ -16,7 +16,7 @@
   "dependencies": {
     "q": "0.9.x",
     "is-running": "1.0.x",
-    "string": "1.7.x"
+    "string": "3.3.x"
   },
   "license": "MIT",
   "engines": {
