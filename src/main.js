@@ -212,6 +212,7 @@ Engine.prototype.timeLimitedGoCommand = function (infoHandler,
                 self.engineProcess.stdout.removeListener('data', engineStdoutListener);
                 var moveRegex = /bestmove (\w+)(.*)?/g;
                 var match = moveRegex.exec(lines[i]);
+								if (!match && lines[i].length==13) match = moveRegex.exec(lines[i]+' ');
                 if (match) {
                     deferred.resolve(utilities.convertToMoveObject(match[1]));
                 } else {
@@ -332,6 +333,7 @@ Engine.prototype.stopCommand = function () {
                 self.engineProcess.stdout.removeListener('data', engineStdoutListener);
                 var moveRegex = /bestmove (\w+)(.*)?/g;
                 var match = moveRegex.exec(lines[i]);
+								if (!match && lines[i].length==13) match = moveRegex.exec(lines[i]+' ');
                 if (match) {
                     deferred.resolve(utilities.convertToMoveObject(match[1]));
                 } else {
